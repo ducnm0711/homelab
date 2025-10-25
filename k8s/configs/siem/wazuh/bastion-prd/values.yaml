@@ -1,0 +1,52 @@
+autoreload:
+  enabled: true
+cert-manager:
+  enabled: false
+certificates:
+  duration: 2160h
+  issuer:
+    name: null
+    type: issuer
+  renewBefore: 360h
+dashboard:
+  cred:
+    existingSecret: ""
+    password: kibanaserver
+    passwordHash: $2a$12$7NCZ.l9ntPhou5zNjZIU4uqXNNWMF7SyF6Y6mcjhHTB6Z1eQubHC.
+  enable_ssl: false
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+indexer:
+  replicas: 3
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  storageSize: 50Gi
+  sysctlImage:
+    enabled: true
+wazuh:
+  apiCred:
+    password: MyS3cr37P450r.*-
+    username: wazuh-wui
+  authd:
+    pass: password
+  worker:
+    replicas: 2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+    storageSize: 50Gi

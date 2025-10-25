@@ -1,0 +1,46 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaNotificationTemplate
+metadata:
+  name: dummy.teams.message
+spec:
+  instanceSelector:
+    matchLabels:
+      datasource: "grafana"
+  name: dummy.teams.message
+  template: |
+    {{ define "dummy.teams.message" }}
+    {{ range .Alerts }}
+
+      {{ if .Annotations }}
+        {{ range .Annotations.SortedPairs }}
+          {{ .Name }}: {{ .Value }}
+        {{ end }}
+      {{ end }}
+
+      {{- with (index .Labels "priority") }}
+        {{- if eq . "P0" }}
+          **Critical system failure. Please response immediately!**
+        {{- end }}
+        {{- if eq . "P1" }}
+          **Major functionality failure. Please response within 30 minutes**
+        {{- end }}
+      {{- end }}
+
+      - **Priority:** {{ index .Labels "priority" }}
+      - **Service Owner:** {{ or (index .Labels "owner") "Not Assigned" }}
+      - **Kubernetes Cluster:** {{ index .Labels "cluster" }}
+
+      {{- if or (eq .Labels.alertname "RedisDown") (eq .Labels.alertname "RabbitmqDown") (eq .Labels.alertname "MinioDown") }}
+        - **Namespace:** {{ index .Labels "namespace" }}
+      {{ end }}
+
+      {{- if eq .Labels.alertname "ClientWebsiteNotReady" }}
+        - **Website Deployment:** {{ index .Labels "deployment" }}
+      {{ end }}
+
+      {{- if eq .Labels.alertname "dummyServiceNotReady" }}
+        - **Name:** {{ index .Labels "exported_service" }}
+      {{ end }}
+
+    {{ end }}
+    {{ end }}

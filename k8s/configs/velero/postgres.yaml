@@ -1,0 +1,45 @@
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: hippo
+  annotations:
+    postgres-operator.crunchydata.com/autoCreateUserSchema: "true"
+    postgres-operator.crunchydata.com/volumeSnapshots: 'true'
+  labels:
+    backup: velero
+spec:
+  metadata:
+    labels:
+      backup: velero
+  postgresVersion: 17
+  users:
+    - name: hippo
+      databases:
+        - zoo
+  instances:
+    - name: instance1
+      dataVolumeClaimSpec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: standard-rwo-retain
+  backups:
+    snapshots:
+      volumeSnapshotClassName: mysnapshotclass
+    pgbackrest:
+      manual:
+        repoName: repo1
+        options:
+         - --type=full
+      repos:
+      - name: repo1
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - "ReadWriteOnce"
+            resources:
+              requests:
+                storage: 1Gi
+            storageClassName: standard-rwo-retain

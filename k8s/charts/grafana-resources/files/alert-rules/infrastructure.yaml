@@ -1,0 +1,64 @@
+rules:
+  - uid: RabbitmqDown
+    title: RabbitmqDown
+    condition: B
+    query:
+      datasource:
+        type: prometheus
+      expr: sum by(cluster, namespace, pod) (rabbitmq_build_info) < bool 1
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: gt
+      value: 0
+    for: 5m
+    annotations:
+      summary: "RabbitMQ is down for the last 5 minutes."
+    labels:
+      owner: "IT Operations"
+      priority: "P0"
+    isPaused: true
+
+  - uid: RedisDown
+    title: RedisDown
+    condition: B
+    query:
+      datasource:
+        type: prometheus
+      expr: redis_up == bool 0
+      editorMode: code
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: gt
+      value: 0
+    for: 5m
+    annotations:
+      summary: "Redis is down for the last 5 minutes."
+    labels:
+      owner: "IT Operations"
+      priority: "P0"
+    isPaused: true
+
+  - uid: MinioDown
+    title: MinioDown
+    condition: B
+    query:
+      datasource:
+        type: prometheus
+      expr: sum by(cluster, namespace) (minio_cluster_health_status) == bool 0
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: gt
+      value: 0
+    for: 5m
+    annotations:
+      summary: "Minio is down for the last 5 minutes."
+    labels:
+      owner: "IT Operations"
+      priority: "P0"
+    isPaused: true

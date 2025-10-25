@@ -1,0 +1,19 @@
+rules:
+  - uid: ClientWebsiteNotReady
+    title: ClientWebsiteNotReady
+    condition: B
+    query:
+      expr: kube_deployment_status_condition{namespace="deployments", status="false", condition="Available"} == 1
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: gt
+      value: 0
+    for: 15m
+    annotations:
+      summary: "Client's website is not ready after more than 15 minutes."
+    labels:
+      owner: "IT Operations"
+      priority: "P1"
+    isPaused: true

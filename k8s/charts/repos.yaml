@@ -1,0 +1,32 @@
+repositories:
+  - name: bitnami
+    url: registry-1.docker.io/bitnamicharts
+    oci: true
+  - name: grafana-operator
+    url: ghcr.io/grafana/helm-charts
+    oci: true
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: gitlab
+    url: https://charts.gitlab.io
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+  - name: runix
+    url: https://helm.runix.net
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: kubernetes-dashboard
+    url: https://kubernetes.github.io/dashboard
+  - name: wazuh
+    url: https://morgoved.github.io/wazuh-helm/
+  - name: external-secrets
+    url: https://charts.external-secrets.io
+  - name: stakater
+    url: https://stakater.github.io/stakater-charts/
+  - name: opensearch-operator
+    url: https://opensearch-project.github.io/opensearch-k8s-operator/
+  - name: pgo
+    url: registry.developers.crunchydata.com/crunchydata
+    oci: true
+  - name: minio
+    url: https://charts.min.io/

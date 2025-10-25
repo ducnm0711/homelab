@@ -1,0 +1,19 @@
+rules:
+  - uid: BackupJobFailed
+    title: BackupJobFailed
+    condition: B
+    query:
+      expr: increase(kube_job_status_failed{namespace="backups", job_name=~".*backup.*"}[24h]) > 0
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: gt
+      value: 0
+    for: 5m
+    annotations:
+      summary: Backup Job {{ $labels.job_name }} has failed. Check the pod logs for details.
+    labels:
+      owner: "IT Operations"
+      priority: "P2"
+    isPaused: true

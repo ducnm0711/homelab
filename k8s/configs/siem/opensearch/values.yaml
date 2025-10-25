@@ -1,0 +1,29 @@
+cluster:
+  name: opensearch-lab
+  nodePools:
+    - component: masters
+      diskSize: "10Gi"
+      replicas: 1
+      roles:
+        - "master"
+        - "data"
+      jvm: "-Xmx1024m -Xms1024m"
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "250m"
+        limits:
+          memory: "3Gi"
+          cpu: "1000m"
+  general:
+    version: 2.19.3
+    image: opensearchproject/opensearch
+    monitoring:
+      enable: true
+      # labels:
+      #   release: prometheus
+      pluginUrl: https://github.com/opensearch-project/opensearch-prometheus-exporter/releases/download/2.19.3.0/prometheus-exporter-2.19.3.0.zip
+  dashboard:
+    enable: false
+  configMgmt:
+    smartScaler: true

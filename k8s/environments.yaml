@@ -1,0 +1,5 @@
+environments:
+  local:
+    kubeContext: docker
+  dev:
+    kubeContext: gke-lr-dev

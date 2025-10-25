@@ -1,0 +1,82 @@
+grafana:
+  secretKeyRef: grafana-secrets-v2
+  instanceSelector:
+    matchLabels:
+      datasource: "grafana"
+  spec:
+    version: "11.6.3"
+    config:
+      log:
+        mode: "console"
+        level: "info"
+      log.console:
+        format: "json"
+      server:
+        root_url: https://grafana-green.dummy.io
+        enable_gzip: "true"
+      auth:
+        disable_login_form: "false"
+      auth.azuread:
+        enabled: "false"
+        allow_sign_up: "true"
+        client_id: "${AZUREAD_CLIENT_ID}"
+        client_secret: "${AZUREAD_CLIENT_SECRET}"
+        auth_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/authorize"
+        token_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/token"
+        allowed_domains: "dummy.io"
+        allowed_groups: ""
+        skip_org_role_sync: "true"
+      # security:
+      #   admin_user: "${ADMIN_USERNAME}"
+      #   admin_password: "${ADMIN_PASSWORD}"
+      #   admin_email: grafana@dummy.io
+      #   disable_initial_admin_creation: "false"
+      smtp:
+        enabled: "false"
+      users:
+        viewers_can_edit: "true"
+  provision:
+    contactPoints:
+      - contactId: dummy-team-prd-alerts
+        contactUrl: https://dummyglobalholdinglimited.webhook.office.com/webhookb2/7f9a9209-4e9f-4538-a968-185887a64cfd@01599455-31f6-4698-812b-887ffb90c9c9/IncomingWebhook/56db33f180ea456594394b44a702a272/88fd40bf-4656-401d-b39b-3741bc13a446/V27sWqbFBYa6zktfFNxZpyGZJsJ0T32ThiVZGDJhzDvoA1
+        alertMatchers:
+          - - cluster
+            - =
+            - gke-prod-dummy
+          - - priority
+            - =~
+            - P0|P1
+      - contactId: dummy-team-non-prd-alerts
+        contactUrl: https://dummyglobalholdinglimited.webhook.office.com/webhookb2/7f9a9209-4e9f-4538-a968-185887a64cfd@01599455-31f6-4698-812b-887ffb90c9c9/IncomingWebhook/0e6461d89d9d489899ab6e4d10f9e43a/88fd40bf-4656-401d-b39b-3741bc13a446/V2phJ2WTm5j07j5KVPhZ29JIIeyRii3_Qwfi1kdQ9_2zQ1
+        alertMatchers:
+          - - cluster
+            - '!~'
+            - gke-prod-dummy
+          - - priority
+            - =~
+            - P0|P1
+    datasources:
+      - clusterId: prod-bastion-dummy
+      - clusterId: non-prod-bastion-dummy
+      ## Application Clusters
+      - clusterId: gke-dev-dummy
+        alertEnabled: true
+      # - clusterId: gke-dev-dummy-web
+      #   alertEnabled: true
+      - clusterId: gke-staging-dummy
+        alertEnabled: true
+      # - clusterId: gke-staging-dummy-web
+      #   alertEnabled: true
+      - clusterId: gke-prod-dummy
+        alertEnabled: true
+      # - clusterId: gke-prod-dummy-web
+      - clusterId: gke-test-dummy
+        alertEnabled: true
+      # - clusterId: gke-test-dummy-web
+
+istioGateway:
+  enabled: false
+  gateways: 
+    - istio-system/ingress
+  hosts:
+    - grafana-green.dummy.io

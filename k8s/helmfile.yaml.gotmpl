@@ -1,0 +1,122 @@
+# Need to declare bases in top and bottom layers
+bases:
+  - environments.yaml
+  - charts/repos.yaml  
+---
+templates:
+  default:
+    missingFileHandler: Warn
+    values:
+    - configs/{{`{{ .Release.Namespace }}`}}/{{`{{ .Release.Name }}`}}/values.yaml
+    - configs/{{`{{ .Release.Namespace }}`}}/{{`{{ .Release.Name }}`}}/{{`{{ .Environment.Name }}`}}/values.yaml
+    secrets:
+    - configs/{{`{{ .Release.Namespace }}`}}/{{`{{ .Release.Name }}`}}/secrets.yaml
+    - configs/{{`{{ .Release.Namespace }}`}}/{{`{{ .Release.Name }}`}}/{{`{{ .Environment.Name }}`}}/secrets.yaml
+---
+helmDefaults:
+  diffArgs:
+    # - "--show-secrets"
+    - "--context=3"
+  skipDeps: false
+  createNamespace: false
+  historyMax: 5
+---
+releases:
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    version: 1.25.0
+    inherit:
+    - template: default
+
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    version: 1.25.0
+    inherit:
+    - template: default
+
+  - name: istio-ingressgateway
+    namespace: istio-system
+    chart: istio/gateway
+    version: 1.24.6
+    inherit:
+    - template: default
+
+  - name: prometheus-blackbox-exporter
+    namespace: observability-client
+    chart: prometheus-community/prometheus-blackbox-exporter
+    version: 9.5.0
+    inherit:
+    - template: default
+
+  - name: pgadmin4
+    namespace: observability-client
+    chart: runix/pgadmin4
+    version: 1.45.1
+    inherit:
+    - template: default
+  
+  - name: k8s-monitoring
+    namespace: observability-client
+    chart: grafana/k8s-monitoring
+    version: 3.0.1
+    inherit:
+    - template: default
+
+  - name: wazuh
+    namespace: siem
+    chart: wazuh/wazuh
+    version: 0.1.4
+    inherit:
+      - template: default
+
+  - name: external-secrets-operator
+    namespace: external-secrets
+    chart: external-secrets/external-secrets
+    version: 0.10.7
+    inherit:
+      - template: default
+
+  - name: grafana-operator
+    namespace: observability
+    chart: grafana-operator/grafana-operator
+    version: v5.18.0
+    inherit:
+      - template: default
+
+  - name: grafana-resources
+    namespace: observability
+    chart: charts/grafana-resources
+    version: 0.1.0
+    inherit:
+      - template: default
+
+  - name: secrets-reloader
+    namespace: external-secrets
+    chart: stakater/reloader
+    version: 2.1.4
+    inherit:
+      - template: default
+
+  - name: opensearch-operator
+    namespace: siem
+    chart: opensearch-operator/opensearch-operator
+    version: 2.8.0
+    inherit:
+      - template: default
+
+  - name: opensearch
+    namespace: siem
+    chart: opensearch-operator/opensearch-cluster
+    version: 3.1.0
+    inherit:
+      - template: default
+
+  - name: pgo
+    namespace: velero
+    chart: pgo/pgo
+    version: 5.8.3
+    inherit:
+      - template: default
+

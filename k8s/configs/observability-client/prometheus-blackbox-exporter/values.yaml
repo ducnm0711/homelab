@@ -1,0 +1,31 @@
+serviceMonitor:
+  enabled: true
+  targets:
+    - name: landing-page
+      url: https://dummy.io
+    - name: app-home
+      url: https://app.dummy.io
+    - name: onboarding
+      url: https://app.dummy.io/onboarding
+    - name: invoices
+      url: https://app.dummy.io/invoices
+    - name: clients
+      url: https://app.dummy.io/clients
+    - name: bookings
+      url: https://app.dummy.io/bookings
+    - name: money
+      url: https://app.dummy.io/money
+    - name: studio
+      url: https://app.dummy.io/studio
+    - name: admin
+      url: https://admin.dummy.io
+    - name: chat-widget
+      url: https://app.dummy.io/chat-widget
+    - name: tools
+      url: https://app.dummy.io/tools
+    - name: cashier
+      url: https://app.dummy.io/cashier
+    - name: api-gateway
+      url:  https://api-gateway.dummy.io/health
+    - name: payments-api-gateway
+      url: https://api-gateway.payments.dummy.io/health

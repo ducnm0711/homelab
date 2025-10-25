@@ -1,0 +1,19 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: alerts
+spec:
+  title: ALERTS
+  instanceSelector:
+{{ toYaml .Values.grafana.instanceSelector | indent 4 }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: dashboards
+spec:
+  title: DASHBOARDS
+  instanceSelector:
+{{ toYaml .Values.grafana.instanceSelector | indent 4 }}
+---
+{{ include "tpl-folders" . }}

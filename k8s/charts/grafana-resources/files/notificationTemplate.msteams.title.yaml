@@ -1,0 +1,13 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaNotificationTemplate
+metadata:
+  name: dummy.teams.title
+spec:
+  instanceSelector:
+    matchLabels:
+      datasource: "grafana"
+  name: dummy.teams.title
+  template: |
+      {{ define "dummy.teams.title" }}
+      [{{ .Status | toUpper }}] {{ len .Alerts }} instance(s) of {{ if gt (len .Alerts) 0 }}{{ (index .Alerts 0).Labels.alertname }}{{ else }}No Alerts{{ end }}
+      {{ end }}

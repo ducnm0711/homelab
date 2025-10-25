@@ -1,0 +1,13 @@
+envVarsExtra:
+  - name: PGADMIN_DISABLE_POSTFIX
+    value: "true"
+
+env:
+    email: pgadmin@dummy.io
+    password: SuperSecret
+
+persistentVolume:
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi

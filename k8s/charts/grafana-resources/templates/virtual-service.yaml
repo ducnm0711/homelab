@@ -1,0 +1,25 @@
+{{- if .Values.istioGateway.enabled }}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  gateways:
+    {{- range .Values.istioGateway.gateways }}
+    - {{ . | quote }}
+    {{- end }}
+  hosts:
+    {{- range .Values.istioGateway.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: {{ .Release.Name }}-service.{{ .Release.Namespace }}.svc.cluster.local
+            port:
+              number: 3000
+{{- end }}

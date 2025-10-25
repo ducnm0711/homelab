@@ -1,0 +1,60 @@
+cluster:
+  name: prod-bastion-dummy
+
+destinations:
+  - name: mimir
+    type: prometheus
+    url: https://mimir.dummy.io/api/v1/push
+    tenantId: prod-bastion-dummy
+    auth:
+      type: basic
+      usernameKey: mimir-username
+      passwordKey: mimir-password
+    secret:
+      create: false
+      name: k8s-monitoring-secrets
+      namespace: observability-client
+  - name: loki
+    type: loki
+    url: https://loki.dummy.io/loki/api/v1/push
+    tenantId: prod-bastion-dummy
+    auth:
+      type: basic
+      usernameKey: loki-username
+      passwordKey: loki-password
+    secret:
+      create: false
+      name: k8s-monitoring-secrets
+      namespace: observability-client
+# An Alloy instance for collecting metrics.
+alloy-metrics:
+  enabled: true
+# An Alloy instance for collecting log data.
+alloy-logs:
+  enabled: true
+# An Alloy instance for data sources required to be deployed on a single replica.
+alloy-singleton:
+  enabled: true
+clusterMetrics:
+  enabled: true
+  collector: alloy-metrics
+  deployAsConfigMap: true
+  kubeDNS:
+    # -- (bool) Scrape metrics from KubeDNS
+    # @default -- `false`
+    # @section -- KubeDNS
+    enabled: true
+# -- Prometheus Operator Objects enables the gathering of metrics from objects like Probes, PodMonitors, and
+# ServiceMonitors. Requires a destination that supports metrics.
+prometheusOperatorObjects:
+  enabled: true
+  collector: alloy-metrics
+clusterEvents:
+  enabled: true
+  collector: alloy-singleton
+nodeLogs:
+  enabled: false
+  collector: alloy-logs
+podLogs:
+  enabled: true
+  collector: alloy-logs

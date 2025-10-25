@@ -1,0 +1,23 @@
+{{- $files := .Files.Glob "files/dashboards/*.json" }}
+{{- range $path, $file := $files }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ base $path | replace ".json" "" | replace "." "-" }}
+data:
+  dashboard.json: |
+{{ toString $file | indent 4 }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ base $path | replace ".json" "" | replace "." "-" }}
+spec:
+  instanceSelector:
+{{ toYaml $.Values.grafana.instanceSelector | indent 4 }}
+  folder: DASHBOARDS
+  configMapRef:
+    name: {{ base $path | replace ".json" "" | replace "." "-" }}
+    key: dashboard.json
+{{- end }}

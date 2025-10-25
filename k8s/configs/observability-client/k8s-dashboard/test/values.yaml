@@ -1,0 +1,48 @@
+# app:
+#   settings:
+#     # Disable login view and skip authentication
+#     auth: 
+#       mode: 'header'
+#       headerName: 'Authorization'
+#       # Skip login form
+#       skipLoginForm: true
+
+# # Configure read-only access
+# rbac:
+#   create: true
+#   clusterReadOnlyRole: true
+#   clusterAdminRole: false
+
+# kong:
+#   enabled: false
+# # Service configuration
+# service:
+#   type: ClusterIP
+#   externalPort: 443
+
+# # Optional: Configure ingress if you want external access
+# ingress:
+#   enabled: false
+#   # Uncomment and configure if you want ingress
+#   # className: ""
+#   # hosts:
+#   #   - host: dashboard.local
+#   #     paths:
+#   #       - path: /
+#   #         pathType: Prefix
+
+# # Security settings
+# securityContext:
+#   runAsUser: 1001
+#   runAsGroup: 2001
+#   runAsNonRoot: true
+#   readOnlyRootFilesystem: true
+
+# # Resource limits
+# resources:
+#   limits:
+#     cpu: 100m
+#     memory: 200Mi
+#   requests:
+#     cpu: 100m
+#     memory: 200Mi
