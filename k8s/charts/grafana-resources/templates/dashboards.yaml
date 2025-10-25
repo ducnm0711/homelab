@@ -1,3 +1,4 @@
+{{ if  .Values.grafana.provision.enabled }}
 {{- $files := .Files.Glob "files/dashboards/*.json" }}
 {{- range $path, $file := $files }}
 ---
@@ -20,4 +21,5 @@ spec:
   configMapRef:
     name: {{ base $path | replace ".json" "" | replace "." "-" }}
     key: dashboard.json
+{{- end }}
 {{- end }}

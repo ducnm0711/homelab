@@ -78,20 +78,6 @@ releases:
     inherit:
       - template: default
 
-  - name: grafana-operator
-    namespace: observability
-    chart: grafana-operator/grafana-operator
-    version: v5.18.0
-    inherit:
-      - template: default
-
-  - name: grafana-resources
-    namespace: observability
-    chart: charts/grafana-resources
-    version: 0.1.0
-    inherit:
-      - template: default
-
   - name: secrets-reloader
     namespace: external-secrets
     chart: stakater/reloader
@@ -113,10 +99,37 @@ releases:
     inherit:
       - template: default
 
-  - name: pgo
-    namespace: velero
-    chart: pgo/pgo
-    version: 5.8.3
+  - name: pg-operator
+    namespace: dbs
+    chart: percona/pg-operator
+    version: 2.7.0
     inherit:
       - template: default
 
+  - name: pg-cluster
+    namespace: dbs
+    chart: percona/pg-db
+    version: 2.7.0
+    inherit:
+      - template: default
+
+  - name: pmm
+    namespace: obs
+    chart: percona/pmm
+    version: 1.4.13
+    inherit:
+      - template: default
+
+  - name: grafana-operator
+    namespace: obs
+    chart: grafana-operator/grafana-operator
+    version: v5.20.0
+    inherit:
+      - template: default
+
+  - name: grafana
+    namespace: obs
+    chart: charts/grafana-resources
+    version: 1.0.0
+    inherit:
+      - template: default

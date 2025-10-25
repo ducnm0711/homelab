@@ -1,3 +1,4 @@
+{{ if  .Values.grafana.provision.enabled }}
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaFolder
 metadata:
@@ -17,3 +18,4 @@ spec:
 {{ toYaml .Values.grafana.instanceSelector | indent 4 }}
 ---
 {{ include "tpl-folders" . }}
+{{- end }}

@@ -30,3 +30,5 @@ repositories:
     oci: true
   - name: minio
     url: https://charts.min.io/
+  - name: percona 
+    url: https://percona.github.io/percona-helm-charts/    

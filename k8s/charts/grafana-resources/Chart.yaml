@@ -2,5 +2,5 @@ apiVersion: v2
 name: grafana-resources
 description: Provision Grafana Operator resources
 type: application
-version: 0.1.0
-appVersion: "0.1"
+version: "1.0.0"
+appVersion: "12.3.0"

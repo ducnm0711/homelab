@@ -1,3 +1,4 @@
+{{ if  .Values.grafana.provision.enabled }}
 {{ .Files.Get "files/notificationTemplate.dummy.team.message.yaml"  }}
 ---
 {{ .Files.Get "files/notificationTemplate.dummy.teams.title.yaml"  }}
@@ -7,3 +8,4 @@
 {{ include "alert-notification-policy" . }}
 ---
 {{ include "alert-rule-group" . }}
+{{- end }}

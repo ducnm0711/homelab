@@ -5,37 +5,38 @@ grafana:
       datasource: "grafana"
   spec:
     version: "11.6.3"
-    config:
-      log:
-        mode: "console"
-        level: "info"
-      log.console:
-        format: "json"
-      server:
-        root_url: https://grafana-green.dummy.io
-        enable_gzip: "true"
-      auth:
-        disable_login_form: "false"
-      auth.azuread:
-        enabled: "false"
-        allow_sign_up: "true"
-        client_id: "${AZUREAD_CLIENT_ID}"
-        client_secret: "${AZUREAD_CLIENT_SECRET}"
-        auth_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/authorize"
-        token_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/token"
-        allowed_domains: "dummy.io"
-        allowed_groups: ""
-        skip_org_role_sync: "true"
-      # security:
-      #   admin_user: "${ADMIN_USERNAME}"
-      #   admin_password: "${ADMIN_PASSWORD}"
-      #   admin_email: grafana@dummy.io
-      #   disable_initial_admin_creation: "false"
-      smtp:
-        enabled: "false"
-      users:
-        viewers_can_edit: "true"
+    config: ""
+      # log:
+      #   mode: "console"
+      #   level: "info"
+      # log.console:
+      #   format: "json"
+      # server:
+      #   root_url: https://grafana-green.dummy.io
+      #   enable_gzip: "true"
+      # auth:
+      #   disable_login_form: "false"
+      # auth.azuread:
+      #   enabled: "false"
+      #   allow_sign_up: "true"
+      #   client_id: "${AZUREAD_CLIENT_ID}"
+      #   client_secret: "${AZUREAD_CLIENT_SECRET}"
+      #   auth_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/authorize"
+      #   token_url: "https://login.microsoftonline.com/01599455-31f6-4698-812b-887ffb90c9c9/oauth2/v2.0/token"
+      #   allowed_domains: "dummy.io"
+      #   allowed_groups: ""
+      #   skip_org_role_sync: "true"
+      # # security:
+      # #   admin_user: "${ADMIN_USERNAME}"
+      # #   admin_password: "${ADMIN_PASSWORD}"
+      # #   admin_email: grafana@dummy.io
+      # #   disable_initial_admin_creation: "false"
+      # smtp:
+      #   enabled: "false"
+      # users:
+      #   viewers_can_edit: "true"
   provision:
+    enabled: false
     contactPoints:
       - contactId: dummy-team-prd-alerts
         contactUrl: https://dummyglobalholdinglimited.webhook.office.com/webhookb2/7f9a9209-4e9f-4538-a968-185887a64cfd@01599455-31f6-4698-812b-887ffb90c9c9/IncomingWebhook/56db33f180ea456594394b44a702a272/88fd40bf-4656-401d-b39b-3741bc13a446/V27sWqbFBYa6zktfFNxZpyGZJsJ0T32ThiVZGDJhzDvoA1

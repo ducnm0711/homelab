@@ -1,0 +1,32 @@
+grafana:
+  instanceSelector:
+    matchLabels:
+      datasource: "grafana"
+  spec:
+    version: "12.2"
+    config:
+      log:
+        mode: "console"
+        level: "info"
+      log.console:
+        format: "json"
+      server:
+        root_url: http://grafana.homelab.local
+        enable_gzip: "true"
+      security:
+        admin_user: root
+        admin_password: secret
+    ingress:
+      spec:
+        ingressClassName: nginx
+        rules:
+          - host: grafana.homelab.local
+            http:
+              paths:
+                - backend:
+                    service:
+                      name: grafana-service
+                      port:
+                        number: 3000
+                  path: /
+                  pathType: Prefix        

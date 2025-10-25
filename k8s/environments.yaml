@@ -1,5 +1,5 @@
 environments:
   local:
-    kubeContext: docker
+    kubeContext: minikube
   dev:
-    kubeContext: gke-lr-dev
+    kubeContext: gke-dev

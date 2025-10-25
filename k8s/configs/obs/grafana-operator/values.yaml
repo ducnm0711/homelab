@@ -1,0 +1,9 @@
+isOpenShift: false
+
+logging:
+  # -- Log encoding ("console", "json")
+  encoder: json
+  # -- Configure the verbosity of logging ("debug", "error", "info")
+  level: info
+  # -- Time encoding ("epoch", "iso8601", "millis", "nano", "rfc3339", "rfc3339nano")
+  time: rfc3339

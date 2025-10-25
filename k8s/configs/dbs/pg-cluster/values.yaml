@@ -1,0 +1,28 @@
+instances:
+- name: ha
+  replicas: 1
+  dataVolumeClaimSpec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+
+proxy:
+  pgBouncer:
+    replicas: 0
+
+backups:
+  enabled: false
+
+pmm:
+  enabled: true
+  # secret: cluster1-pmm-secret
+  serverHost: monitoring-service.obs
+#  querySource: pgstatmonitor
+#  customClusterName: "<string>"
+#  postgresParams: "<string>"
+#  resources:
+#    requests:
+#      memory: 200M
+#      cpu: 500m
