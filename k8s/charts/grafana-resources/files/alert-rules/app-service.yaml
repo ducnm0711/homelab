@@ -1,0 +1,21 @@
+rules:
+  - uid: dummyServiceNotReady
+    title: dummyServiceNotReady
+    condition: B
+    query:
+      datasource:
+        type: prometheus
+      expr: dummy_service_health
+      timeRange:
+        from: 600
+        to: 0
+    threshold:
+      operator: lt
+      value: 1
+    for: 5m
+    annotations:
+      summary: "dummy service is not ready after 5 minutes."
+    labels:
+      owner: "Developement Team"
+      priority: "P0"
+    isPaused: true
