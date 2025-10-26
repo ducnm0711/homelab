@@ -4,3 +4,19 @@ ingress:
     - host: pmm.homelab.local
       paths:
         - /
+
+secret:
+  create: true
+  pmm_password: admin
+
+storage:
+  size: 5Gi
+
+extraVolumes:
+  - name: clickhouse-config
+    configMap:
+      name: pmm-ch-config
+
+extraVolumeMounts:
+  - name: clickhouse-config
+    mountPath: /etc/clickhouse-server/config.d/

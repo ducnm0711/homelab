@@ -13,9 +13,19 @@ grafana:
       server:
         root_url: http://grafana.homelab.local
         enable_gzip: "true"
+      # https://forums.percona.com/t/pmm-and-grafana-not-loading-same-in-browser-tab/11996
+      auth:
+        login_cookie_name: grafana_homelab_session
       security:
-        admin_user: root
-        admin_password: secret
+        admin_user: admin
+        admin_password: admin
+    persistentVolumeClaim:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
     ingress:
       spec:
         ingressClassName: nginx
