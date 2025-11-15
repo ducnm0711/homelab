@@ -7,28 +7,34 @@ repositories:
     oci: true
   - name: prometheus-community
     url: https://prometheus-community.github.io/helm-charts
-  - name: gitlab
-    url: https://charts.gitlab.io
-  - name: istio
-    url: https://istio-release.storage.googleapis.com/charts
-  - name: runix
-    url: https://helm.runix.net
-  - name: grafana
-    url: https://grafana.github.io/helm-charts
-  - name: kubernetes-dashboard
-    url: https://kubernetes.github.io/dashboard
-  - name: wazuh
-    url: https://morgoved.github.io/wazuh-helm/
-  - name: external-secrets
-    url: https://charts.external-secrets.io
-  - name: stakater
-    url: https://stakater.github.io/stakater-charts/
-  - name: opensearch-operator
-    url: https://opensearch-project.github.io/opensearch-k8s-operator/
-  - name: pgo
-    url: registry.developers.crunchydata.com/crunchydata
-    oci: true
-  - name: minio
-    url: https://charts.min.io/
   - name: percona 
     url: https://percona.github.io/percona-helm-charts/    
+  - name: k8ssandra 
+    url: https://helm.k8ssandra.io/stable
+  - name: cert-manager
+    url: https://charts.jetstack.io
+
+
+  # - name: gitlab
+  #   url: https://charts.gitlab.io
+  # - name: istio
+  #   url: https://istio-release.storage.googleapis.com/charts
+  # - name: runix
+  #   url: https://helm.runix.net
+  # - name: grafana
+  #   url: https://grafana.github.io/helm-charts
+  # - name: kubernetes-dashboard
+  #   url: https://kubernetes.github.io/dashboard
+  # - name: wazuh
+  #   url: https://morgoved.github.io/wazuh-helm/
+  # - name: external-secrets
+  #   url: https://charts.external-secrets.io
+  # - name: stakater
+  #   url: https://stakater.github.io/stakater-charts/
+  # - name: opensearch-operator
+  #   url: https://opensearch-project.github.io/opensearch-k8s-operator/
+  # - name: pgo
+  #   url: registry.developers.crunchydata.com/crunchydata
+  #   oci: true
+  # - name: minio
+  #   url: https://charts.min.io/

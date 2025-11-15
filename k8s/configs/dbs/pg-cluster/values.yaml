@@ -1,3 +1,8 @@
+metadata:
+  labels:
+    global.label.alpha: postgresql
+    global.label.beta: postgresql
+
 instances:
 - name: ha
   replicas: 1
@@ -7,16 +12,20 @@ instances:
     resources:
       requests:
         storage: 5Gi
-
+  metadata:
+    labels:
+      instance.label.alpha: postgresql
+      instance.label.beta: postgresql
+      # app.kubernetes.io/name: cannot-override-percona-postgresql
 proxy:
   pgBouncer:
-    replicas: 0
+    replicas: 1
 
 backups:
   enabled: false
 
 pmm:
-  enabled: true
+  enabled: false
   # secret: cluster1-pmm-secret
   serverHost: monitoring-service.obs
 #  querySource: pgstatmonitor
