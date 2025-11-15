@@ -6,6 +6,7 @@
 - Docker Desktop + Minikube
 -> Colima + Minikube
 -> Colima + Minikube x3
+
 **Desired State**
 - **Colima** — lightweight Docker-compatible VM (replaces Docker Desktop)
 - **k3s** — lightweight Kubernetes distribution for multi-node testing
@@ -32,7 +33,7 @@ colima start --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz
 colima ssh -- df -h
 colima ssh -- free -m
 
-minikube start
+minikube start --nodes=3
 minikube addons enable ingress
 minikube addons enable metrics-server
 minikube start --auto-pause-interval=5m
