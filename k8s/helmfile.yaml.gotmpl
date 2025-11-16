@@ -141,8 +141,6 @@ releases:
     namespace: infra
     chart: cert-manager/cert-manager
     version: v1.19.1
-    labels:
-      service: infra
     inherit:
     - template: default
 
@@ -151,7 +149,6 @@ releases:
     chart: k8ssandra/k8ssandra-operator
     version: 1.29.0
     labels:
-      service: dbs
-      type: nosql
+      service: cassandra
     inherit:
       - template: default

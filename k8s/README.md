@@ -3,15 +3,23 @@
 ### macOS (M4 Pro)
 
 **Current Setup**
-- Docker Desktop + Minikube
--> Colima + Minikube
--> Colima + Minikube x3
+- Colima + k3s cluster
 
 **Desired State**
 - **Colima** — lightweight Docker-compatible VM (replaces Docker Desktop)
 - **k3s** — lightweight Kubernetes distribution for multi-node testing
 - **Portainer CE** — web-based UI for managing Docker and Kubernetes
 
+#### Quick Start
+```bash
+colima start --profile m4 --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz
+colima ssh --profile m4 -- df -h
+colima ssh --profile m4 -- free -m
+k3d cluster create homelab \
+  --agents 2 \
+  -p "8080:80@loadbalancer" \
+  -p "8443:443@loadbalancer"
+```
 ---
 
 ### Windows 11 (AMD Ryzen 5 2600, 32 GB RAM)
@@ -29,7 +37,7 @@
 ### Minikube Setup
 
 ```bash
-colima start --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz
+colima start --profile m4 --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz
 colima ssh -- df -h
 colima ssh -- free -m
 
