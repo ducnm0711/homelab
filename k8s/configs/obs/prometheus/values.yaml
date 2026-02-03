@@ -17,3 +17,46 @@ kubeScheduler:
   enabled: false
 kubeProxy:
   enabled: false
+
+grafana:
+  image:
+    tag: 12.3.1
+  adminPassword: admin
+  imageRenderer:
+    enabled: true
+    image:
+      tag: v5.4.0
+    env:
+      LOG_LEVEL: debug
+  grafana.ini:
+    security:
+      cookie_samesite: none
+      cookie_secure: false
+    rendering:
+      renderer_token: '-'
+    server:
+      root_url: http://grafana.homelab.local
+      enable_gzip: "true"
+  useStatefulSet: true
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: "local-path"
+    size: 1Gi
+  ingress:
+    enabled: true
+    # annotations:
+      # traefik.ingress.kubernetes.io/router.middlewares: default-cors-headers@kubernetescrd
+    # ingressClassName: nginx
+    hosts:
+      - grafana.homelab.local
+
+prometheus:
+  prometheusSpec:
+    retention: 1d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi
