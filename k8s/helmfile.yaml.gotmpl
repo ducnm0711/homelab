@@ -136,6 +136,13 @@ releases:
     inherit:
       - template: default
 
+  - name: prometheus
+    namespace: obs
+    chart: prometheus-community/kube-prometheus-stack
+    version: 80.5.0
+    inherit:
+      - template: default
+
 ## CASSANDRA STACK
   - name: cert-manager
     namespace: infra

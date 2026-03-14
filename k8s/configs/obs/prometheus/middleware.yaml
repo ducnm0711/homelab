@@ -1,0 +1,37 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: cors-headers
+  namespace: obs
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - OPTIONS
+      - PUT
+      - POST
+      - DELETE
+    accessControlAllowOriginList:
+      - http://grafana.homelab.local:8080
+    accessControlAllowHeaders:
+      - "*"
+    accessControlAllowCredentials: true
+    accessControlMaxAge: 100
+    addVaryHeader: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana
+  namespace: obs
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(\`grafana.homelab.local\`)
+    kind: Rule
+    services:
+    - name: prometheus-grafana
+      port: 80
+    middlewares:
+    - name: cors-headers

@@ -19,6 +19,7 @@ k3d cluster create homelab \
   --agents 2 \
   -p "8080:80@loadbalancer" \
   -p "8443:443@loadbalancer"
+k3d cluster start homelab
 ```
 ---
 
