@@ -1,19 +1,22 @@
 repositories:
-  - name: bitnami
-    url: registry-1.docker.io/bitnamicharts
-    oci: true
-  - name: grafana-operator
-    url: ghcr.io/grafana/helm-charts
-    oci: true
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
-  - name: percona 
-    url: https://percona.github.io/percona-helm-charts/    
-  - name: k8ssandra 
-    url: https://helm.k8ssandra.io/stable
+  # - name: bitnami
+  #   url: registry-1.docker.io/bitnamicharts
+  #   oci: true
+  # - name: grafana-operator
+  #   url: ghcr.io/grafana/helm-charts
+  #   oci: true
+  # - name: prometheus-community
+  #   url: https://prometheus-community.github.io/helm-charts
+  # - name: percona 
+  #   url: https://percona.github.io/percona-helm-charts/    
+  # - name: k8ssandra 
+  #   url: https://helm.k8ssandra.io/stable
   - name: cert-manager
     url: https://charts.jetstack.io
-
+  - name: openbao
+    url: https://openbao.github.io/openbao-helm
+  - name: tailscale
+    url: https://pkgs.tailscale.com/helmcharts
 
   # - name: gitlab
   #   url: https://charts.gitlab.io

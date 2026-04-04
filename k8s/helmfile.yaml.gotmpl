@@ -1,7 +1,7 @@
 # Need to declare bases in top and bottom layers
 bases:
   - environments.yaml
-  - charts/repos.yaml  
+  - charts/repos.yaml
 ---
 templates:
   default:
@@ -147,7 +147,7 @@ releases:
   - name: cert-manager
     namespace: infra
     chart: cert-manager/cert-manager
-    version: v1.19.1
+    version: v1.20.1
     inherit:
     - template: default
 
@@ -159,3 +159,17 @@ releases:
       service: cassandra
     inherit:
       - template: default
+
+  - name: openbao
+    namespace: infra
+    chart: openbao/openbao
+    version: 0.26.2
+    inherit:
+    - template: default
+
+  - name: tailscale-operator
+    namespace: infra
+    chart: tailscale/tailscale-operator
+    version: 1.94.2
+    inherit:
+    - template: default

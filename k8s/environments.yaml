@@ -1,6 +1,9 @@
 environments:
-  local:
-    # kubeContext: minikube
-    kubeContext: k3d-homelab
   dev:
-    kubeContext: gke-dev
+    # kubeContext: minikube
+    kubeContext: k3d-lab-dev
+  prd:
+    # kubeContext: minikube
+    kubeContext: k3d-lab-prd
+  # dev:
+  #   kubeContext: gke-dev

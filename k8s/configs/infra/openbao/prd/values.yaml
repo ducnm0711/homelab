@@ -1,0 +1,19 @@
+global:
+  tlsDisable: true
+
+injector:
+  replicas: 2
+
+server:
+  updateStrategyType: "RollingUpdate"
+  dev:
+    enabled: false
+    devRootToken: "root"  
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      # Enables Raft integrated storage
+      enabled: true
+      # Set the Node Raft ID to the name of the pod
+      setNodeId: true

@@ -1,0 +1,8 @@
+global:
+  tlsDisable: true
+
+injector:
+  replicas: 1
+
+server:
+  updateStrategyType: "RollingUpdate"

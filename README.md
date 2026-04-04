@@ -7,3 +7,8 @@ My homelab journey has always mirrored my career's growth. It evolved from an ea
 Now, with my life settled, it's time to give my beloved homelab a permanent, physical location. Inspired by my mentor's home setup in France, I'm embarking on a multi-year project to build my own Home Server.
 
 This repository is the first brick. It will house all the work, customizations, and lab research that define my setup.
+
+For windows alike clipboard
+```
+brew install maccy
+```
