@@ -6,6 +6,9 @@ injector:
 
 server:
   updateStrategyType: "RollingUpdate"
+  service:
+    annotations:  
+      tailscale.com/expose: "true"
   dev:
     enabled: false
     devRootToken: "root"  
@@ -17,3 +20,23 @@ server:
       enabled: true
       # Set the Node Raft ID to the name of the pod
       setNodeId: true
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/openbao/data"
+          retry_join {
+            leader_api_addr = "http://openbao-active:8200"
+            # leader_client_cert_file = "/openbao/tls/openbao.crt"
+            # leader_client_key_file = "/openbao/tls/openbao.key"
+            # leader_ca_cert_file = "/openbao/tls/openbao.ca"
+          }
+        }
+
+        service_registration "kubernetes" {}
