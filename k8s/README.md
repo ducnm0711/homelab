@@ -12,7 +12,9 @@ Hybrid management across **macOS (M4 Pro)** via Colima/VZ and **Windows 11 (Ryze
 
 ```bash
 # MacOS: Start Colima VM
-colima start --profile m4 --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz
+colima start --profile k8s --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz --mount-type virtiofs
+colima start --profile mix --cpu 4 --memory 8 --disk 60 --arch aarch64 --vm-type vz --mount-type virtiofs
+colima start --profile mcp --cpu 2 --memory 2 --disk 10 --arch aarch64 --vm-type vz --mount-type virtiofs
 
 # K3d: Create Lab Environments
 k3d cluster create lab-dev
