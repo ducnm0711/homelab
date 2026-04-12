@@ -1,3 +1,4 @@
 .dev
 .local/
 *.tgz
+.vscode
