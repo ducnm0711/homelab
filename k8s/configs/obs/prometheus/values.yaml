@@ -23,7 +23,7 @@ grafana:
     tag: 12.3.1
   adminPassword: admin
   imageRenderer:
-    enabled: true
+    enabled: false
     image:
       tag: v5.4.0
     env:
@@ -44,12 +44,7 @@ grafana:
     storageClassName: "local-path"
     size: 1Gi
   ingress:
-    enabled: true
-    # annotations:
-      # traefik.ingress.kubernetes.io/router.middlewares: default-cors-headers@kubernetescrd
-    # ingressClassName: nginx
-    hosts:
-      - grafana.homelab.local
+    enabled: false
 
 prometheus:
   prometheusSpec:

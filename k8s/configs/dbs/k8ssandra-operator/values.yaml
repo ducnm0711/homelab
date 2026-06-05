@@ -1,0 +1,5 @@
+global:
+  clusterScoped: true
+
+cass-operator:
+  disableCertManagerCheck: true

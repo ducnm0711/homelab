@@ -1,0 +1,54 @@
+apiVersion: k8ssandra.io/v1alpha1
+kind: K8ssandraCluster
+metadata:
+  name: demo
+  namespace: dbs
+spec:
+  cassandra:
+    serverVersion: "5.0.6"
+    telemetry:
+      vector:
+        enabled: true
+        components:
+          sinks:
+            - name: console_log
+              type: console
+              inputs:
+                - parse_cassandra_log
+              config: |
+                target = "stdout"
+                [sinks.console_log.encoding]
+                codec = "json"
+            # - name: console_log
+            #   type: console
+            #   inputs:
+            #     - systemlog
+            #   config: |
+            #     target = "stdout"
+            #     [sinks.console_output.encoding]
+            #     codec = "json"                
+        scrapeInterval: 30s
+      prometheus:
+        enabled: true
+        commonLabels:
+          release: prometheus
+    datacenters:
+      - metadata:
+          name: dc1
+        size: 1
+        storageConfig:
+          cassandraDataVolumeClaimSpec:
+            storageClassName: local-path
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 5Gi
+        config:
+          jvmOptions:
+            heapSize: 512M
+          cassandraYaml:
+            audit_logging_options:
+              enabled: true
+              logger: FileAuditLogger
+              included_categories: "AUTH,DCL"

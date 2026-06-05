@@ -10,6 +10,7 @@ Hybrid management across **macOS (M4 Pro)** via Colima/VZ and **Windows 11 (Ryze
 | `lab-prd-lb` | k3d | 1+2 Agents | LoadBalancer testing (Ports 8080/8443). |
 | `homelab` | minikube | 3 Nodes | Add-on testing (Metrics-Server, Ingress, Auto-pause). |
 
+Update: Switch to ObsStack instead of Colima
 ```bash
 # MacOS: Start Colima VM
 colima start --profile k8s --cpu 6 --memory 12 --disk 100 --arch aarch64 --vm-type vz --mount-type virtiofs

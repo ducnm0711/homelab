@@ -147,14 +147,16 @@ releases:
   - name: cert-manager
     namespace: infra
     chart: cert-manager/cert-manager
-    version: v1.20.1
+    version: v1.20.2
+    labels:
+      service: infra
     inherit:
     - template: default
 
   - name: k8ssandra-operator
     namespace: dbs
     chart: k8ssandra/k8ssandra-operator
-    version: 1.29.0
+    version: 1.32.1
     labels:
       service: cassandra
     inherit:
