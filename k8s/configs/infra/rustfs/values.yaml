@@ -1,0 +1,11 @@
+mode:
+  standalone:
+    enabled: "true"
+  distributed:
+    enabled: "false"
+
+replicaCount: 1
+secret:
+  rustfs:
+    access_key: "homelabas3access"
+    secret_key: "homelabs3secret"

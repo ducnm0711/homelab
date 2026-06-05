@@ -1,0 +1,32 @@
+loki:
+  storage:
+    storage:
+    # Loki requires a bucket for chunks and the ruler.
+    # Please provide these values if you are using object storage.
+    # bucketNames:
+    #   chunks: FIXME
+    #   ruler: FIXME
+    type: filesystem
+    bucketNames:
+      chunks: chunks
+      ruler: ruler
+  structuredConfig:
+    storage_config:
+      named_stores:
+        aws:
+          s3-loki-chunks:
+            endpoint: 's3.example.com'
+            bucketnames: chunks
+            access_key_id: '<s3-access-key>'
+            secret_access_key: '<s3-secret-key>'
+            s3forcepathstyle: true
+            insecure: true
+    schema_config:
+      configs:
+        - from: "2026-05-01"
+          store: tsdb
+          object_store: s3-loki-chunks
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h

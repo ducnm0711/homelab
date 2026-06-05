@@ -121,11 +121,18 @@ releases:
     inherit:
       - template: default
 
-## LGTM STACK
+## LGTM STACK - OTEL COLLECTOR, LOKI, GRAFANA
   - name: grafana-operator
     namespace: obs
-    chart: grafana-operator/grafana-operator
-    version: v5.20.0
+    chart: grafana/grafana-operator
+    version: 5.23.0
+    inherit:
+      - template: default
+
+  - name: loki
+    namespace: obs
+    chart: grafana-community/loki
+    version: 17.1.7
     inherit:
       - template: default
 
@@ -135,6 +142,8 @@ releases:
     version: 1.0.0
     inherit:
       - template: default
+
+
 
   - name: prometheus
     namespace: obs
@@ -175,3 +184,11 @@ releases:
     version: 1.94.2
     inherit:
     - template: default
+
+## OBJECT STORAGE
+  - name: rustfs
+    namespace: infra
+    chart: rustfs/rustfs
+    version: 0.7.0
+    inherit:
+      - template: default
