@@ -1,0 +1,9 @@
+mode:
+  standalone:
+    enabled: true
+  distributed:
+    enabled: false
+
+service:
+  annotations:
+    tailscale.com/expose: "true"

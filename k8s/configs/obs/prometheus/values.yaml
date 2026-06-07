@@ -19,6 +19,7 @@ kubeProxy:
   enabled: false
 
 grafana:
+  enabled: false
   image:
     tag: 12.3.1
   adminPassword: admin
