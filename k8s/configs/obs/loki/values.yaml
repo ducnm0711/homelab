@@ -1,24 +1,23 @@
 loki:
+  commonConfig:
+    replication_factor: 1
   storage:
-    storage:
-    # Loki requires a bucket for chunks and the ruler.
-    # Please provide these values if you are using object storage.
-    # bucketNames:
-    #   chunks: FIXME
-    #   ruler: FIXME
-    type: filesystem
+    type: s3  
     bucketNames:
-      chunks: chunks
-      ruler: ruler
+      chunks: loki-chunks
+      ruler: loki-ruler
   structuredConfig:
     storage_config:
       named_stores:
         aws:
           s3-loki-chunks:
-            endpoint: 's3.example.com'
-            bucketnames: chunks
-            access_key_id: '<s3-access-key>'
-            secret_access_key: '<s3-secret-key>'
+            endpoint: "rustfs-svc.infra.svc.cluster.local:9000"
+            bucketnames: loki-chunks
+            s3forcepathstyle: true
+            insecure: true
+          s3-loki-ruler:
+            endpoint: "rustfs-svc.infra.svc.cluster.local:9000"
+            bucketnames: loki-ruler
             s3forcepathstyle: true
             insecure: true
     schema_config:
@@ -30,3 +29,64 @@ loki:
           index:
             prefix: index_
             period: 24h
+
+deploymentMode: Monolithic
+
+singleBinary:
+  replicas: 1
+
+# -- Section for configuring optional Helm test
+test:
+  enabled: false
+lokiCanary:
+  enabled: false
+
+# Shrink the Memcached instances down to homelab-friendly constraints
+chunksCache:
+  enabled: true
+  allocatedMemory: 256     # Allocates 256MB to the memcached engine (Default is 8192MB)
+  resources:
+    limits:
+      memory: 300Mi
+    requests:
+      cpu: 50m
+      memory: 300Mi
+
+resultsCache:
+  enabled: true
+  allocatedMemory: 128     # Allocates 128MB to the query results engine
+  resources:
+    limits:
+      memory: 150Mi
+    requests:
+      cpu: 50m
+      memory: 150Mi
+
+# Zero out replica counts of other deployment modes
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
+ingester:
+  replicas: 0
+querier:
+  replicas: 0
+queryFrontend:
+  replicas: 0
+queryScheduler:
+  replicas: 0
+distributor:
+  replicas: 0
+compactor:
+  replicas: 0
+indexGateway:
+  replicas: 0
+bloomPlanner:
+  replicas: 0
+bloomBuilder:
+  replicas: 0
+bloomGateway:
+  replicas: 0
