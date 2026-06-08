@@ -143,9 +143,25 @@ releases:
     inherit:
       - template: default
 
+  - name: opentelemetry-kube-stack
+    namespace: obs
+    chart: open-telemetry/opentelemetry-kube-stack
+    version: 0.15.2
+    labels:
+      service: otel
+    inherit:
+      - template: default
 
+  - name: opentelemetry-operator
+    namespace: obs
+    chart: open-telemetry/opentelemetry-operator
+    version: 0.114.1
+    labels:
+      service: otel-operator
+    inherit:
+      - template: default
 
-  - name: prometheus
+  - name: kube-prometheus-stack
     namespace: obs
     chart: prometheus-community/kube-prometheus-stack
     version: 80.5.0

@@ -10,6 +10,8 @@ repositories:
     oci: true
   - name: rustfs
     url: https://rustfs.github.io/helm/
+  - name: open-telemetry
+    url: https://open-telemetry.github.io/opentelemetry-helm-charts
 
   # - name: prometheus-community
   #   url: https://prometheus-community.github.io/helm-charts
