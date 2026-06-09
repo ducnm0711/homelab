@@ -30,6 +30,8 @@ loki:
           index:
             prefix: index_
             period: 24h
+    limits_config:
+      retention_period: 24h
 
 deploymentMode: Monolithic
 
