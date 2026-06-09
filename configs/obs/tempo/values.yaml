@@ -1,0 +1,40 @@
+tempo:
+  reportingEnabled: false
+
+  storage:
+    trace:
+      backend: s3
+      s3:
+        endpoint: "rustfs-svc.infra.svc.cluster.local:9000"
+        bucket: tempo-traces
+        forcepathstyle: true
+        insecure: true
+        access_key: "homelabas3access"
+        secret_key: "homelabs3secret"
+      wal:
+        path: /var/tempo/wal
+  
+  receiver:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+  
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+persistence:
+  enabled: false
+
+serviceMonitor:
+  enabled: true
+
+tempoQuery:
+  enabled: false

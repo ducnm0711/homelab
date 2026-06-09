@@ -1,0 +1,52 @@
+defaultRules:
+  create: false
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: true
+  defaultDashboardsEnabled: false
+  adminUser: admin
+  adminPassword: admin
+  useStatefulSet: true
+  persistence:
+    enabled: true
+    size: 1Gi
+  sidecar:
+    dashboards:
+      enabled: false
+    datasources:
+      enabled: false
+      alertmanagers:
+        enabled: false
+
+# k3d lab-prd: Disable Prometheus Service Monitor for below components
+kubeApiServer:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+coreDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+nodeExporter:
+  enabled: true
+kubeStateMetrics:
+  enabled: true
+
+prometheus:
+  prometheusSpec:
+    retention: 1d
+    enableRemoteWriteReceiver: true
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi

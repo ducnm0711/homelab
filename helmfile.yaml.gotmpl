@@ -124,15 +124,8 @@ releases:
 ## LGTM STACK - OTEL COLLECTOR, LOKI, GRAFANA
   - name: grafana-operator
     namespace: obs
-    chart: grafana/grafana-operator
+    chart: grafana-oci/grafana-operator
     version: 5.23.0
-    inherit:
-      - template: default
-
-  - name: loki
-    namespace: obs
-    chart: grafana-community/loki
-    version: 17.1.7
     inherit:
       - template: default
 
@@ -143,28 +136,49 @@ releases:
     inherit:
       - template: default
 
-  - name: opentelemetry-kube-stack
+  - name: loki
     namespace: obs
-    chart: open-telemetry/opentelemetry-kube-stack
-    version: 0.15.2
-    labels:
-      service: otel
+    chart: grafana-community/loki
+    version: 17.1.7
     inherit:
       - template: default
 
-  - name: opentelemetry-operator
+  - name: tempo
     namespace: obs
-    chart: open-telemetry/opentelemetry-operator
-    version: 0.114.1
-    labels:
-      service: otel-operator
+    chart: grafana-community/tempo
+    version: 2.2.0
     inherit:
       - template: default
+
+  - name: alloy
+    namespace: obs
+    chart: grafana/alloy
+    version: 1.8.2
+    inherit:
+      - template: default
+
+  # - name: opentelemetry-kube-stack
+  #   namespace: obs
+  #   chart: open-telemetry/opentelemetry-kube-stack
+  #   version: 0.15.2
+  #   labels:
+  #     service: otel
+  #   inherit:
+  #     - template: default
+
+  # - name: opentelemetry-operator
+  #   namespace: obs
+  #   chart: open-telemetry/opentelemetry-operator
+  #   version: 0.114.1
+  #   labels:
+  #     service: otel-operator
+  #   inherit:
+  #     - template: default
 
   - name: kube-prometheus-stack
     namespace: obs
     chart: prometheus-community/kube-prometheus-stack
-    version: 80.5.0
+    version: 86.2.0
     inherit:
       - template: default
 
