@@ -1,0 +1,86 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "openbao-unseal.fullname" . }}
+  labels:
+    {{- include "openbao-unseal.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.cronjob.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "openbao-unseal.selectorLabels" . | nindent 12 }}
+        spec:
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+          volumes:
+            - name: unseal-keys
+              secret:
+                secretName: {{ include "openbao-unseal.fullname" . }}-keys
+          containers:
+            - name: unseal
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: OPENBAO_ADDR
+                  value: {{ .Values.openbao.address | quote }}
+                - name: OPENBAO_PORT
+                  value: {{ .Values.openbao.port | quote }}
+                - name: KEY_FILE
+                  value: /etc/unseal-keys/keys
+              volumeMounts:
+                - name: unseal-keys
+                  mountPath: /etc/unseal-keys
+                  readOnly: true
+              {{- with .Values.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  apk add --no-cache curl jq >/dev/null 2>&1
+
+                  keys=$(cat "${KEY_FILE}")
+                  addr="http://${OPENBAO_ADDR}:${OPENBAO_PORT}"
+
+                  sealed=$(curl -sf "${addr}/v1/sys/seal-status" | jq -r '.sealed')
+                  if [ "${sealed}" != "true" ]; then
+                    echo "OpenBao is already unsealed"
+                    exit 0
+                  fi
+
+                  echo "OpenBao is sealed, unsealing..."
+
+                  for key in ${keys}; do
+                    [ -z "${key}" ] && continue
+                    resp=$(curl -sf -X POST -d "{\"key\":\"${key}\"}" "${addr}/v1/sys/unseal")
+                    sealed=$(echo "${resp}" | jq -r '.sealed')
+                    if [ "${sealed}" = "true" ]; then
+                      progress=$(echo "${resp}" | jq -r '.progress')
+                      total=$(echo "${resp}" | jq -r '.t')
+                      echo "  progress: ${progress}/${total}"
+                    else
+                      echo "OpenBao unsealed successfully"
+                      exit 0
+                    fi
+                  done
+
+                  echo "ERROR: not enough unseal keys provided"
+                  exit 1

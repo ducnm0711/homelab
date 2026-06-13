@@ -52,3 +52,7 @@ Kubernetes backup/restore with S3-compatible storage. Previously deployed on GKE
 | minio / rustfs | velero / infra | S3-compatible backup target (MinIO 100Gi or RustFS bucket) |
 | cert-manager | infra | Webhook TLS for backup targets |
 | volume-snapshotclass | cluster | Required for PV snapshots (CSI driver dependent) |
+
+## 6. Percona + OpenBao
+
+OpenBao provides dynamic database credentials for the Percona PostgreSQL cluster via the database secrets engine. The OpenBao agent injector (triggered by `vault.hashicorp.com/*` annotations on the PG pod) fetches short-lived secrets from `secret/data/dbs/pg-operator/users`, and a dedicated sidecar runs `/opt/bao/apply-pg-users.sh` to apply them to the database.
