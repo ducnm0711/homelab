@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-log-generator
+  namespace: obs
+  labels:
+    app: log-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator
+  template:
+    metadata:
+      labels:
+        app: log-generator
+    spec:
+      containers:
+        - name: telemetrygen
+          image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+          command: ["/telemetrygen"]
+          args:
+            - "logs"
+            - "--otlp-endpoint=alloy.obs.svc.cluster.local:4317"
+            - "--otlp-insecure"
+            - "--duration=inf" # Keep running infinitely
+            - "--rate=5"       # Emit 5 log records per second
+            - "--workers=1"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi

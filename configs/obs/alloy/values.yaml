@@ -1,0 +1,90 @@
+alloy:
+  configMap:
+    create: true
+    content: |
+      logging {
+        level = "info"
+      }
+
+      // 1. Unified OTLP Ingestion Receiver (gRPC & HTTP)
+      otelcol.receiver.otlp "default" {
+        grpc { endpoint = "0.0.0.0:4317" }
+        http { endpoint = "0.0.0.0:4318" }
+
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+          logs    = [otelcol.processor.batch.default.input]
+          traces  = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      // 2. Shared Batch Processor for performance tuning
+      otelcol.processor.batch "default" {
+        output {
+          metrics = [otelcol.exporter.prometheus.default.input]
+          logs    = [otelcol.exporter.loki.default.input]
+          traces  = [otelcol.exporter.otlp.tempo.input]
+        }
+      }
+
+      // ==========================================
+      // METRICS PIPELINE -> Prometheus
+      // ==========================================
+      otelcol.exporter.prometheus "default" {
+        forward_to = [prometheus.remote_write.default.receiver]
+      }
+
+      prometheus.remote_write "default" {
+        endpoint {
+          url = "http://kube-prometheus-stack-prometheus.obs.svc.cluster.local:9090/api/v1/write"
+        }
+      }
+
+      // ==========================================
+      // LOGS PIPELINE -> Loki
+      // ==========================================
+      otelcol.exporter.loki "default" {
+        forward_to = [loki.write.default.receiver]
+      }
+
+      loki.write "default" {
+        endpoint {
+          url = "http://loki-gateway.obs.svc.cluster.local/loki/api/v1/push"
+        }
+      }
+
+      // ==========================================
+      // TRACES PIPELINE -> Tempo
+      // ==========================================
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo.obs.svc.cluster.local:4317"
+          tls {
+            insecure = true
+          }
+        }
+      }
+
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+
+controller:
+  type: daemonset
+
+serviceMonitor:
+  enabled: true
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi

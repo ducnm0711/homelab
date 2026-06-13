@@ -104,6 +104,9 @@ releases:
     namespace: dbs
     chart: percona/pg-operator
     version: 2.8.0
+    labels:
+      lab: postgresql
+      postgresql: "true"
     inherit:
       - template: default
 
@@ -111,6 +114,9 @@ releases:
     namespace: dbs
     chart: charts/pg-db
     version: 2.8.0
+    labels:
+      lab: postgresql
+      postgresql: "true"
     inherit:
       - template: default
 
@@ -118,21 +124,20 @@ releases:
     namespace: obs
     chart: percona/pmm
     version: 1.4.13
+    labels:
+      lab: postgresql
+      postgresql: "true"
     inherit:
       - template: default
 
 ## LGTM STACK - OTEL COLLECTOR, LOKI, GRAFANA
   - name: grafana-operator
     namespace: obs
-    chart: grafana/grafana-operator
+    chart: grafana-oci/grafana-operator
     version: 5.23.0
-    inherit:
-      - template: default
-
-  - name: loki
-    namespace: obs
-    chart: grafana-community/loki
-    version: 17.1.7
+    labels:
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default
 
@@ -140,31 +145,67 @@ releases:
     namespace: obs
     chart: charts/grafana-resources
     version: 1.0.0
+    labels:
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default
 
-  - name: opentelemetry-kube-stack
+  - name: loki
     namespace: obs
-    chart: open-telemetry/opentelemetry-kube-stack
-    version: 0.15.2
+    chart: grafana-community/loki
+    version: 17.1.7
     labels:
-      service: otel
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default
 
-  - name: opentelemetry-operator
+  - name: tempo
     namespace: obs
-    chart: open-telemetry/opentelemetry-operator
-    version: 0.114.1
+    chart: grafana-community/tempo
+    version: 2.2.0
     labels:
-      service: otel-operator
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default
+
+  - name: alloy
+    namespace: obs
+    chart: grafana/alloy
+    version: 1.8.2
+    labels:
+      lab: lgtm
+      lgtm: "true"
+    inherit:
+      - template: default
+
+  # - name: opentelemetry-kube-stack
+  #   namespace: obs
+  #   chart: open-telemetry/opentelemetry-kube-stack
+  #   version: 0.15.2
+  #   labels:
+  #     service: otel
+  #   inherit:
+  #     - template: default
+
+  # - name: opentelemetry-operator
+  #   namespace: obs
+  #   chart: open-telemetry/opentelemetry-operator
+  #   version: 0.114.1
+  #   labels:
+  #     service: otel-operator
+  #   inherit:
+  #     - template: default
 
   - name: kube-prometheus-stack
     namespace: obs
     chart: prometheus-community/kube-prometheus-stack
-    version: 80.5.0
+    version: 86.2.0
+    labels:
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default
 
@@ -175,6 +216,11 @@ releases:
     version: v1.20.2
     labels:
       service: infra
+      lab: shared
+      lgtm: "true"
+      cassandra: "true"
+      postgresql: "true"
+      openbao: "true"
     inherit:
     - template: default
 
@@ -184,6 +230,8 @@ releases:
     version: 1.32.1
     labels:
       service: cassandra
+      lab: cassandra
+      cassandra: "true"
     inherit:
       - template: default
 
@@ -191,6 +239,9 @@ releases:
     namespace: infra
     chart: openbao/openbao
     version: 0.26.2
+    labels:
+      lab: openbao
+      openbao: "true"
     inherit:
     - template: default
 
@@ -198,6 +249,9 @@ releases:
     namespace: infra
     chart: tailscale/tailscale-operator
     version: 1.98.4
+    labels:
+      lab: openbao
+      openbao: "true"
     inherit:
     - template: default
 
@@ -206,5 +260,8 @@ releases:
     namespace: infra
     chart: rustfs/rustfs
     version: 0.7.0
+    labels:
+      lab: lgtm
+      lgtm: "true"
     inherit:
       - template: default

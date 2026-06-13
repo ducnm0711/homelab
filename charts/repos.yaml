@@ -2,9 +2,11 @@ repositories:
   # - name: bitnami
   #   url: registry-1.docker.io/bitnamicharts
   #   oci: true
-  - name: grafana
+  - name: grafana-oci
     url: ghcr.io/grafana/helm-charts
     oci: true
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
   - name: grafana-community
     url: ghcr.io/grafana-community/helm-charts
     oci: true

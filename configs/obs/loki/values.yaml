@@ -1,4 +1,5 @@
 loki:
+  auth_enabled: false
   commonConfig:
     replication_factor: 1
   storage:
@@ -29,6 +30,9 @@ loki:
           index:
             prefix: index_
             period: 24h
+    limits_config:
+      retention_period: 24h
+      allow_structured_metadata: true
 
 deploymentMode: Monolithic
 
