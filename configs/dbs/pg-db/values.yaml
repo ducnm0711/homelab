@@ -1,0 +1,80 @@
+instances:
+  - name: ha
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "dbs-pg-operator"
+        # Mount the secret to your requested path
+        vault.hashicorp.com/agent-inject-file-pg-db: "db-creds.json"
+        # Define the source path in OpenBao (mount point + /data/ + path)
+        vault.hashicorp.com/agent-inject-secret-pg-db: "kv/data/pg-db"
+        # Template the JSON output
+        vault.hashicorp.com/agent-inject-template-pg-db: |
+          {{- with secret "kv/data/pg-db" -}}
+          {
+            "username": "{{ .Data.data.username }}",
+            "password": "{{ .Data.data.password }}"
+          }
+          {{- end -}}
+    sidecars:
+    - name: my-sidecar-1
+      image: docker.io/percona/percona-distribution-postgresql:18.4-1
+      command: ["/bin/bash", "-c"]
+      args:
+      - |
+        # 1. Wait for the file to be present (Sequential block - finishes once file exists)
+        while [ ! -f /vault/secrets/db-creds.json ]; do
+          echo "Waiting for secret..."
+          sleep 2
+        done
+
+        # 2. Combined Infinite Loop (Runs both tasks sequentially on every iteration)
+        while true; do
+          echo "=================================================="
+          echo "--- Secret Content at $(date -u) ---"
+          cat /vault/secrets/db-creds.json
+
+          echo "--- Parsing credentials with sed and testing connection ---"
+          # Extract username and password safely
+          DB_USER=$(sed -n 's/.*"username": *"\([^"]*\)".*/\1/p' /vault/secrets/db-creds.json)
+          DB_PASS=$(sed -n 's/.*"password": *"\([^"]*\)".*/\1/p' /vault/secrets/db-creds.json)
+
+          # Export password for psql execution
+          export PGPASSWORD="$DB_PASS"
+
+          # Run connection verification
+          if psql -h 127.0.0.1 -p 5432 -U "$DB_USER" -d postgres -c "SELECT version();"; then
+            echo "Status: Connection successful!"
+          else
+            echo "Status: Connection failed!"
+          fi
+
+          # Cleanup and sleep before the next combined iteration
+          unset PGPASSWORD
+          sleep 10
+        done
+    dataVolumeClaimSpec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+# users:
+#   - name: postgres
+#     options: 'SUPERUSER'
+
+# databaseInitSQL:
+#   key: init.sql
+#   name: pg-init-sql
+proxy:
+  pgBouncer:
+    replicas: 0
+
+backups:
+  enabled: true
+
+pmm:
+  enabled: false
+  # secret: cluster1-pmm-secret
+  # serverHost: monitoring-service.obs

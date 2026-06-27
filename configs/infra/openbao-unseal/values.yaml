@@ -1,0 +1,3 @@
+openbao:
+  address: openbao.infra.svc.cluster.local
+  port: 8200

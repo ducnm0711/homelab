@@ -1,0 +1,6 @@
+apiVersion: v2
+name: openbao-unseal
+description: A Helm chart to unseal OpenBao using unseal keys from a Kubernetes Secret
+type: application
+version: "0.1.0"
+appVersion: "1.0.0"
