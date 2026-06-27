@@ -1,0 +1,42 @@
+http:
+  routers:
+    dashboard:
+      rule: "Host(`homelab.akita-beaufort.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: tailscale
+      service: api@internal
+      middlewares:
+        - dashboard-auth
+        - dashboard-slash
+    # portainer:
+    #   rule: "Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/portainer`)"
+    #   entryPoints:
+    #     - websecure
+    #   tls:
+    #     certResolver: tailscale
+    #   service: portainer
+    #   middlewares:
+    #     - portainer-strip
+
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        users:
+          - "truenas_admin:$2y$05$yZc2oknLeQnh5nSVImOF1ugMQjFhwWB56VBypJR91iuD.yUzr0e/y"
+    dashboard-slash:
+      redirectRegex:
+        regex: "^https://homelab.akita-beaufort.ts.net/dashboard$"
+        replacement: "https://homelab.akita-beaufort.ts.net/dashboard/"
+        permanent: true
+  #   portainer-strip:
+  #     stripPrefix:
+  #       prefixes:
+  #         - "/portainer"
+
+  # services:
+  #   portainer:
+  #     loadBalancer:
+  #       servers:
+  #         - url: "http://192.168.1.69:9000"

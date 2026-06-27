@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+
+  tailscale:
+    image: ghcr.io/tailscale/tailscale:v1.98.4
+    container_name: tailscale
+    hostname: homelab
+    restart: unless-stopped
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_HOSTNAME=homelab
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SOCKET=/var/run/tailscale/tailscaled.sock
+      - TS_EXTRA_ARGS=--accept-dns=false
+    volumes:
+      - tailscale-homelab-state:/var/lib/tailscale
+      - tailscale-sock:/var/run/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - proxy
+
+  traefik:
+    image: traefik:v3.7.5
+    container_name: traefik
+    restart: unless-stopped
+    depends_on:
+      tailscale:
+        condition: service_healthy
+    network_mode: "service:tailscale"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - tailscale-sock:/var/run/tailscale:rw
+      - /mnt/SSD/app-configs/portainer/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=proxy"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.tailscale.tailscale=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--log.level=INFO"
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.dashboard.rule=Host(`homelab.akita-beaufort.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    #   - "traefik.http.routers.dashboard.entrypoints=websecure"
+    #   - "traefik.http.routers.dashboard.tls.certresolver=tailscale"
+    #   - "traefik.http.routers.dashboard.service=api@internal"
+
+  hello:
+    image: nginxdemos/hello
+    container_name: hello
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hello.rule=Host(`homelab.akita-beaufort.ts.net`)"
+      - "traefik.http.routers.hello.entrypoints=websecure"
+      - "traefik.http.routers.hello.tls.certresolver=tailscale"
+      - "traefik.http.services.hello.loadbalancer.server.port=80"
+
+volumes:
+  tailscale-homelab-state:
+    external: true
+  tailscale-sock:       # ephemeral shared socket volume, no external needed
+
+networks:
+  proxy:
+    external: true
