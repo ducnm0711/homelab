@@ -34,56 +34,39 @@ To streamline configuration, eliminate external DNS complexity, and bypass wildc
 
 ## 3. High-Level Architecture Diagrams
 
-### 3.1 Network Topology and Path Distribution
-The diagram below illustrates how an incoming user on the Tailscale overlay network safely routes to either the host layer or the application proxy, eliminating host socket binding conflicts:
+### 3.1 Network Topology & Perimeter Routing
 
     ```text
-                        +------------------------------------+
-                        |        Tailscale VPN Cloud         |
-                        +------------------------------------+
-                                   /              \
-                                  /                \
-                                 /                  \
-                                v                    v
-        +----------------------------------+  +------------------------------------+
-        | Host Tailnet Node ("truenas")    |  | App Tailnet Node ("homelab")        |
-        | IP: 100.X.Y.Z                    |  | IP: 100.A.B.C                      |
-        +----------------------------------+  +------------------------------------+
-                         |                                      |
-                         | (Port 80/443)                        v
-                         v                             +------------------+
-        +----------------------------------+           | Traefik Proxy    |
-        | TrueNAS Management GUI           |           | (Network Stack)  |
-        | (Web UI/Middleware Host Layer)   |           +------------------+
-                         +------------------+             /     |      \
-                                                        /      |       \
-                                          /portainer   /   /grafana     \ /gitea
-                                                      v        v         v
-                                              +-----------+ +--------+ +--------+
-                                              | Portainer | |Grafana | | Gitea  |
-                                              +-----------+ +--------+ +--------+
-    ```
-
-### 3.2 Perimeter Routing & Infrastructure Layering
-
-    ```text
-      Internet / Tailscale Overlay
+      Internet / Tailscale VPN Cloud
                    │
           ┌────────┴────────┐
           │                 │
       Tailnet A         Tailnet B
      (truenas.com)     (homelab.com)
           │                 │
-    Native Tailscale   Docker Tailscale
           │                 │
-     TrueNAS GUI         Traefik
+    Native Tailscale    Traefik Proxy
+    (TrueNAS App)      (Network Anchor)
+          │                 │
+          ▼                 │
+    +──────────────+        │
+    │ TrueNAS GUI  │    Docker Tailscale
+    │ (Web UI/SSH) │  (joins via network_mode:
+    +──────────────+   "service:traefik")
                             │
-          ┌─────────────────┼─────────────────┐
-          │                 │                 │
-      /portainer        /grafana           /gitea
-          │                 │                 │
-      Portainer          Grafana            Gitea
+                  ┌─────────┼─────────┐
+                  │         │         │
+                  ▼         ▼         ▼
+              /portainer /grafana   /gitea
+                  │         │         │
+              Portainer  Grafana    Gitea
     ```
+
+    **Tailnet A — Management Tailscale (Native TrueNAS App):**
+    Bound to the TrueNAS OS. Handles admin access to the TrueNAS Web GUI and SSH at `https://truenas.com`.
+
+    **Tailnet B — App Tailscale (Traefik Proxy + Tailscale Container):**
+    Traefik is the **network anchor** attached to the `proxy` bridge. The Tailscale container joins Traefik's network namespace via `network_mode: "service:traefik"`, sharing the same network stack and exposing Traefik directly on the Tailnet at `https://homelab.com`.
 
 ---
 
@@ -164,122 +147,31 @@ This stack deploys the application Tailscale edge node and binds Traefik directl
         external: true
     ```
 
-### 6.2 Monitoring Stack
-Handles performance telemetry, log aggregation, and metric visualization.
+### 6.2 Other Stacks (Monitoring, Development, Media)
 
-    ```yaml
-    version: '3.8'
-    
-    services:
-      prometheus:
-        image: prom/prometheus:latest
-        container_name: monitoring-prometheus
-        volumes:
-          - /mnt/tank/data/prometheus:/etc/prometheus
-        networks:
-          - homelab-private
-        restart: unless-stopped
-    
-      loki:
-        image: grafana/loki:latest
-        container_name: monitoring-loki
-        networks:
-          - homelab-private
-        restart: unless-stopped
-    
-      grafana:
-        image: grafana/grafana:latest
-        container_name: monitoring-grafana
-        volumes:
-          - /mnt/tank/data/grafana:/var/lib/grafana
-        networks:
-          - homelab-private
-        labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.grafana.rule=Host(`homelab.com`) && PathPrefix(`/grafana`)"
-          - "traefik.http.routers.grafana.entrypoints=websecure"
-          - "traefik.http.middlewares.grafana-strip.stripprefix.prefixes=/grafana"
-          - "traefik.http.routers.grafana.middlewares=grafana-strip"
-          - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-        restart: unless-stopped
-    
+All app services follow the same label pattern. Here is the generic template:
+
+```yaml
+services:
+  <service>:
+    image: <image>:<tag>
     networks:
-      homelab-private:
-        external: true
-    ```
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.<name>.rule=Host(`homelab.com`) && PathPrefix(`/<path>`)"
+      - "traefik.http.routers.<name>.entrypoints=websecure"
+      - "traefik.http.middlewares.<name>-strip.stripprefix.prefixes=/<path>"
+      - "traefik.http.routers.<name>.middlewares=<name>-strip"
+      - "traefik.http.services.<name>.loadbalancer.server.port=<port>"
+```
 
-### 6.3 Development Stack
-Houses version control registries and local code build repositories.
-
-    ```yaml
-    version: '3.8'
-    
-    services:
-      gitea:
-        image: gitea/gitea:latest
-        container_name: dev-gitea
-        volumes:
-          - /mnt/tank/data/gitea:/data
-        networks:
-          - homelab-private
-        labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.gitea.rule=Host(`homelab.com`) && PathPrefix(`/gitea`)"
-          - "traefik.http.routers.gitea.entrypoints=websecure"
-          - "traefik.http.middlewares.gitea-strip.stripprefix.prefixes=/gitea"
-          - "traefik.http.routers.gitea.middlewares=gitea-strip"
-          - "traefik.http.services.gitea.loadbalancer.server.port=3000"
-        restart: unless-stopped
-    
-    networks:
-      homelab-private:
-        external: true
-    ```
-
-### 6.4 Media Stack
-Manages dense personal asset ingest engines and multi-user media presentation frameworks.
-
-    ```yaml
-    version: '3.8'
-    
-    services:
-      immich:
-        image: ghcr.io/immich-app/immich-server:release
-        container_name: media-immich
-        volumes:
-          - /mnt/tank/data/immich:/usr/src/app/upload
-        networks:
-          - homelab-private
-        labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.immich.rule=Host(`homelab.com`) && PathPrefix(`/immich`)"
-          - "traefik.http.routers.immich.entrypoints=websecure"
-          - "traefik.http.middlewares.immich-strip.stripprefix.prefixes=/immich"
-          - "traefik.http.routers.immich.middlewares=immich-strip"
-          - "traefik.http.services.immich.loadbalancer.server.port=2283"
-        restart: unless-stopped
-    
-      jellyfin:
-        image: jellyfin/jellyfin:latest
-        container_name: media-jellyfin
-        volumes:
-          - /mnt/tank/data/jellyfin:/config
-          - /mnt/tank/media:/data/media
-        networks:
-          - homelab-private
-        labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.jellyfin.rule=Host(`homelab.com`) && PathPrefix(`/jellyfin`)"
-          - "traefik.http.routers.jellyfin.entrypoints=websecure"
-          - "traefik.http.middlewares.jellyfin-strip.stripprefix.prefixes=/jellyfin"
-          - "traefik.http.routers.jellyfin.middlewares=jellyfin-strip"
-          - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-        restart: unless-stopped
-    
-    networks:
-      homelab-private:
-        external: true
-    ```
+| Stack      | Service  | Image                              | Path         | Port |
+|------------|----------|------------------------------------|--------------|------|
+| Monitoring | Grafana  | `grafana/grafana:latest`           | `/grafana`   | 3000 |
+| Development| Gitea    | `gitea/gitea:latest`               | `/gitea`     | 3000 |
+| Media      | Immich   | `immich-app/immich-server:release` | `/immich`    | 2283 |
+| Media      | Jellyfin | `jellyfin/jellyfin:latest`         | `/jellyfin`  | 8096 |
 
 ---
 
