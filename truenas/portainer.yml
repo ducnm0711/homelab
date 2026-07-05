@@ -1,0 +1,131 @@
+networks:
+  proxy:
+    external: True
+services:
+  portainer:
+    cap_drop:
+      - ALL
+    command:
+      - '--data'
+      - /data
+      - '--http-enabled'
+      - '--base-url=/portainer'
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4096M
+    environment:
+      GID: '568'
+      GROUP_ID: '568'
+      NVIDIA_VISIBLE_DEVICES: void
+      PGID: '568'
+      PUID: '568'
+      TZ: Etc/UTC
+      UID: '568'
+      UMASK: '002'
+      UMASK_SET: '002'
+      USER_ID: '568'
+    group_add:
+      - 568
+      - 999
+    healthcheck:
+      disable: True
+    image: portainer/portainer-ce:2.43.0
+    labels:
+      - traefik.enable=true
+      - >-
+        traefik.http.routers.portainer.rule=Path(`/portainer`) ||
+        PathPrefix(`/portainer/`)
+      - traefik.http.middlewares.portainer-strip.stripprefix.prefixes=/portainer
+      - traefik.http.routers.portainer.middlewares=portainer-strip
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.tls=true
+    networks:
+      - proxy
+    platform: linux/amd64
+    ports:
+      - mode: ingress
+        protocol: tcp
+        published: 9000
+        target: 9000
+    privileged: False
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    stdin_open: False
+    tty: False
+    user: '568:568'
+    volumes:
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/SSD/app/portainer
+        target: /data
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /mnt/SSD/config/compose
+        target: /data/compose
+        type: bind
+      - bind:
+          create_host_path: False
+          propagation: rprivate
+        read_only: False
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+volumes: {}
+x-action-required: False
+x-notes: >
+  # Portainer
+
+
+  ## Security
+
+
+  **Read the following security precautions to ensure that you wish to continue
+  using this application.**
+
+
+  ---
+
+
+  ### Container: [portainer]
+
+
+  #### Running user/group(s)
+
+
+  - User: 568
+
+  - Group: 568
+
+  - Supplementary Groups: apps, docker
+
+
+  #### Passing Host Files, Devices, or Sockets into the Container
+
+
+  - Docker Socket (/var/run/docker.sock) - (Read/Write)
+
+
+  ---
+
+
+  ## Bug Reports and Feature Requests
+
+
+  If you find a bug in this app or have an idea for a new feature, please file
+  an issue at
+
+  https://github.com/truenas/apps
+x-portals:
+  - host: 0.0.0.0
+    name: HTTPS
+    path: /
+    port: 9000
+    scheme: https
