@@ -12,7 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - tailscale-sock:/var/run/tailscale:rw
-      - /mnt/SSD/app-configs/portainer/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - /mnt/SSD/config/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
     command:
       - "--api.dashboard=true"
       - "--api.insecure=true"
@@ -22,6 +22,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.http.tls.certResolver=tailscale"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.tailscale.tailscale=true"
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
