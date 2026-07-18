@@ -275,3 +275,14 @@ releases:
       lgtm: "true"
     inherit:
       - template: default
+
+## MEDIA STACK
+  - name: jellyfin
+    namespace: app
+    chart: jellyfin/jellyfin
+    version: 3.2.0
+    labels:
+      lab: media
+      media: "true"
+    inherit:
+      - template: default

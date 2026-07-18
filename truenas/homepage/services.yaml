@@ -1,0 +1,13 @@
+- Infrastructure:
+    - Traefik Dashboard:
+        href: https://homelab.akita-beaufort.ts.net/dashboard/
+        icon: traefik
+        description: Network Proxy & SSL
+    - Portainer:
+        href: https://homelab.akita-beaufort.ts.net/portainer/
+        icon: portainer
+        description: Docker Management
+    - TrueNAS:
+        href: https://truenas.akita-beaufort.ts.net/truenas/
+        icon: truenas
+        description: Storage & Server Management
