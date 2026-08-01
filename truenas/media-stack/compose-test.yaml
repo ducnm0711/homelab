@@ -1,0 +1,124 @@
+version: "3.8"
+
+services:
+  # VPN Container: Routes traffic for indexers and downloaders to bypass ISP blocking
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=custom # Replace with your VPN provider (e.g., nordvpn, protonvpn)
+      - TZ=Asia/Ho_Chi_Minh
+      # You will need to add your VPN credentials here (varies by provider, check Gluetun wiki)
+    ports:
+      - 8080:8080 # qBittorrent Web UI (Mapped through VPN)
+      - 9696:9696 # Prowlarr Web UI (Mapped through VPN)
+      - 6881:6881 # qBittorrent torrent port
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  # Torrent Client: Routed through Gluetun
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun" # Forces qBittorrent to use the VPN connection
+    environment:
+      - PUID=568 # Default TrueNAS 'apps' user ID
+      - PGID=568 # Default TrueNAS 'apps' group ID
+      - TZ=Asia/Ho_Chi_Minh
+      - WEBUI_PORT=8080
+    volumes:
+      - /mnt/pool/appdata/qbittorrent:/config # Absolute path for config
+      - /mnt/pool/media:/data # Unified media path for hardlinks
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+
+  # Indexer Manager: Routed through Gluetun to bypass Cloudflare/ISP blocks
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/pool/appdata/prowlarr:/config
+    restart: unless-stopped
+    depends_on:
+      - gluetun
+
+  # Movies Automation
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/pool/appdata/radarr:/config
+      - /mnt/pool/media:/data # Unified media path for hardlinks
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  # TV Shows Automation
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/pool/appdata/sonarr:/config
+      - /mnt/pool/media:/data # Unified media path for hardlinks
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  # Subtitles Automation
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/pool/appdata/bazarr:/config
+      - /mnt/pool/media:/data
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  # Cloudflare Bypass Tool (for Prowlarr)
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - 8191:8191
+    restart: unless-stopped
+
+  # Media Server
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/pool/appdata/jellyfin:/config
+      - /mnt/pool/media:/data
+    ports:
+      - 8096:8096
+    restart: unless-stopped
