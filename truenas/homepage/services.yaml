@@ -11,3 +11,14 @@
         href: https://truenas.akita-beaufort.ts.net/truenas/
         icon: truenas
         description: Storage & Server Management
+
+- Media:
+    - Jellyfin:
+        href: https://homelab.akita-beaufort.ts.net/jellyfin
+        icon: jellyfin
+        description: Media Server
+        # Optional: Uncomment and add your API key to enable live stream stats
+        # widget:
+        #   type: jellyfin
+        #   url: http://jellyfin:8096  # Homepage can talk directly to the container internally
+        #   key: your_jellyfin_api_key_here
