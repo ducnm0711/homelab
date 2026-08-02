@@ -17,8 +17,26 @@
         href: https://homelab.akita-beaufort.ts.net/jellyfin
         icon: jellyfin
         description: Media Server
-        # Optional: Uncomment and add your API key to enable live stream stats
-        # widget:
-        #   type: jellyfin
-        #   url: http://jellyfin:8096  # Homepage can talk directly to the container internally
-        #   key: your_jellyfin_api_key_here
+        Optional: Add Jellyfin API key to enable live stream stats
+        widget:
+          type: jellyfin
+          url: http://jellyfin:8096/jellyfin
+          key: change-me
+    - Radarr:
+        href: https://homelab.akita-beaufort.ts.net/radarr
+        icon: radarr
+        description: Movie Automation
+    - Bazarr:
+        href: https://homelab.akita-beaufort.ts.net/bazarr
+        icon: bazarr
+        description: Subtitle Automation
+
+- LAN Access Only:
+    - Prowlarr:
+        href: http://homelab.local:9696
+        icon: prowlarr
+        description: Indexer Manager — LAN only
+    - qBittorrent:
+        href: http://homelab.local:8080
+        icon: qbittorrent
+        description: Download Client — LAN only

@@ -1,9 +1,8 @@
 version: "3.8"
 
 services:
-  # Downloader (Exposed directly to local network)
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:5.2.3
     container_name: qbittorrent
     environment:
       - PUID=568
@@ -14,15 +13,17 @@ services:
       - /mnt/SSD/config/qbittorrent:/config
       - /mnt/tier-2-hdd-stripe-test/media:/media
     ports:
-      - 8080:8080       # Local Web UI
+      - 8080:8080       # Web UI (Local LAN Access)
       - 6881:6881       # Torrent TCP
       - 6881:6881/udp   # Torrent UDP
     restart: unless-stopped
+    # Removed proxy network and Traefik labels to keep this safely on local LAN
 
-# Indexer Manager (Exposed directly to local network)
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:2.5.2
     container_name: prowlarr
+    depends_on:
+      - qbittorrent
     environment:
       - PUID=568
       - PGID=568
@@ -30,12 +31,15 @@ services:
     volumes:
       - /mnt/SSD/config/prowlarr:/config
     ports:
-      - 9696:9696       # Web UI
+      - 9696:9696       # Web UI (Local LAN Access)
     restart: unless-stopped
 
   radarr:
     image: lscr.io/linuxserver/radarr:6.3.0.10514-ls312
     container_name: radarr
+    depends_on:
+      - prowlarr
+      - qbittorrent
     networks:
       - proxy
     environment:
@@ -56,11 +60,33 @@ services:
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
     restart: unless-stopped
 
-# 1. The Init Container runs first, fixes permissions, then exits.
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:1.6.0
+    container_name: bazarr
+    depends_on:
+      - radarr
+    networks:
+      - proxy
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+      - BAZARR__SERVER__URLBASE=/bazarr
+    volumes:
+      - /mnt/SSD/config/bazarr:/config
+      - /mnt/tier-2-hdd-stripe-test/media:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/bazarr`)"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.tls.certresolver=tailscale"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+    restart: unless-stopped
+
   permissions-fix:
-    image: alpine:latest
+    image: alpine:3.23.5
     container_name: jellyfin-permissions
-    # Do not set restart policy here, we only want it to run once per deployment
     user: "root"
     volumes:
       - jellyfin-transcodes:/cache/transcodes
@@ -76,10 +102,14 @@ services:
         fi
       '
 
-  # 2. Jellyfin waits for the init container to succeed before booting
   jellyfin:
     image: jellyfin/jellyfin:10.11.11
     container_name: jellyfin
+    depends_on:
+      permissions-fix:
+        condition: service_completed_successfully
+      radarr:
+        condition: service_started
     restart: unless-stopped
     user: '568:568'
     networks:
@@ -88,14 +118,11 @@ services:
       - TZ=Etc/GMT+7
       - JELLYFIN_CACHE_DIR=/cache
     ports:
-      # Access via http://<IP>:8096 for the initial Base URL setup
       - '8096:8096'
     volumes:
-      # Update the left side of these paths if they differ on your NAS
       - /mnt/SSD/config/jellyfin/config:/config
       - /mnt/SSD/config/jellyfin/cache:/cache
       - jellyfin-transcodes:/cache/transcodes
-      # Update this to point to your actual media dataset:
       - /mnt/tier-2-hdd-stripe-test/media:/media
     labels:
       - "traefik.enable=true"
