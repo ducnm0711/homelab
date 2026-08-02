@@ -1,0 +1,42 @@
+- Infrastructure:
+    - Traefik Dashboard:
+        href: https://homelab.akita-beaufort.ts.net/dashboard/
+        icon: traefik
+        description: Network Proxy & SSL
+    - Portainer:
+        href: https://homelab.akita-beaufort.ts.net/portainer/
+        icon: portainer
+        description: Docker Management
+    - TrueNAS:
+        href: https://truenas.akita-beaufort.ts.net/truenas/
+        icon: truenas
+        description: Storage & Server Management
+
+- Media:
+    - Jellyfin:
+        href: https://homelab.akita-beaufort.ts.net/jellyfin
+        icon: jellyfin
+        description: Media Server
+        Optional: Add Jellyfin API key to enable live stream stats
+        widget:
+          type: jellyfin
+          url: http://jellyfin:8096/jellyfin
+          key: change-me
+    - Radarr:
+        href: https://homelab.akita-beaufort.ts.net/radarr
+        icon: radarr
+        description: Movie Automation
+    - Bazarr:
+        href: https://homelab.akita-beaufort.ts.net/bazarr
+        icon: bazarr
+        description: Subtitle Automation
+
+- LAN Access Only:
+    - Prowlarr:
+        href: http://homelab.local:9696
+        icon: prowlarr
+        description: Indexer Manager — LAN only
+    - qBittorrent:
+        href: http://homelab.local:8080
+        icon: qbittorrent
+        description: Download Client — LAN only

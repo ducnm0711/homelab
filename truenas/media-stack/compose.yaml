@@ -1,0 +1,140 @@
+version: "3.8"
+
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:5.2.3
+    container_name: qbittorrent
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+      - WEBUI_PORT=8080
+    volumes:
+      - /mnt/SSD/config/qbittorrent:/config
+      - /mnt/tier-2-hdd-stripe-test/media:/media
+    ports:
+      - 8080:8080       # Web UI (Local LAN Access)
+      - 6881:6881       # Torrent TCP
+      - 6881:6881/udp   # Torrent UDP
+    restart: unless-stopped
+    # Removed proxy network and Traefik labels to keep this safely on local LAN
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:2.5.2
+    container_name: prowlarr
+    depends_on:
+      - qbittorrent
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/SSD/config/prowlarr:/config
+    ports:
+      - 9696:9696       # Web UI (Local LAN Access)
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:6.3.0.10514-ls312
+    container_name: radarr
+    depends_on:
+      - prowlarr
+      - qbittorrent
+    networks:
+      - proxy
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - /mnt/SSD/config/radarr:/config
+      - /mnt/tier-2-hdd-stripe-test/media:/media
+    ports:
+      - 7878:7878
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/radarr`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.routers.radarr.tls.certresolver=tailscale"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:1.6.0
+    container_name: bazarr
+    depends_on:
+      - radarr
+    networks:
+      - proxy
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Ho_Chi_Minh
+      - BAZARR__SERVER__URLBASE=/bazarr
+    volumes:
+      - /mnt/SSD/config/bazarr:/config
+      - /mnt/tier-2-hdd-stripe-test/media:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/bazarr`)"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.tls.certresolver=tailscale"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+    restart: unless-stopped
+
+  permissions-fix:
+    image: alpine:3.23.5
+    container_name: jellyfin-permissions
+    user: "root"
+    volumes:
+      - jellyfin-transcodes:/cache/transcodes
+    command: >
+      sh -c '
+        echo "==> Setting permissions on /cache/transcodes..."
+        if chown -R 568:568 /cache/transcodes && chmod -R 775 /cache/transcodes; then
+          echo "[SUCCESS] Permissions updated successfully!"
+          exit 0
+        else
+          echo "[ERROR] Failed to set permissions!"
+          exit 1
+        fi
+      '
+
+  jellyfin:
+    image: jellyfin/jellyfin:10.11.11
+    container_name: jellyfin
+    depends_on:
+      permissions-fix:
+        condition: service_completed_successfully
+      radarr:
+        condition: service_started
+    restart: unless-stopped
+    user: '568:568'
+    networks:
+      - proxy
+    environment:
+      - TZ=Etc/GMT+7
+      - JELLYFIN_CACHE_DIR=/cache
+    ports:
+      - '8096:8096'
+    volumes:
+      - /mnt/SSD/config/jellyfin/config:/config
+      - /mnt/SSD/config/jellyfin/cache:/cache
+      - jellyfin-transcodes:/cache/transcodes
+      - /mnt/tier-2-hdd-stripe-test/media:/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/jellyfin`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.tls.certresolver=tailscale"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+
+volumes:
+  jellyfin-transcodes:
+
+networks:
+  proxy:
+    external: true

@@ -49,18 +49,30 @@ services:
       - NET_ADMIN
       - SYS_MODULE
 
-  hello:
-    image: nginxdemos/hello
-    container_name: hello
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v1.13.2
+    container_name: homepage
     restart: unless-stopped
     networks:
       - proxy
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homelab.akita-beaufort.ts.net
+      PUID: 568
+      PGID: 568
+    volumes:
+      # Stores your Homepage configuration files (bookmarks, services, widgets)
+      - /mnt/SSD/config/homepage:/app/config
+      # Optional: Allows Homepage to read Docker states for its widget integrations
+      - /var/run/docker.sock:/var/run/docker.sock:ro 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hello.rule=Host(`homelab.akita-beaufort.ts.net`)"
-      - "traefik.http.routers.hello.entrypoints=websecure"
-      - "traefik.http.routers.hello.tls.certresolver=tailscale"
-      - "traefik.http.services.hello.loadbalancer.server.port=80"
+      # Using the same domain you used for the hello container
+      - "traefik.http.routers.homepage.rule=Host(`homelab.akita-beaufort.ts.net`)"
+      - "traefik.http.routers.homepage.entrypoints=websecure"
+      - "traefik.http.routers.homepage.tls=true"
+      - "traefik.http.routers.homepage.tls.certresolver=tailscale"
+      # Homepage listens on port 3000 internally
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
 volumes:
   tailscale-homelab-state:

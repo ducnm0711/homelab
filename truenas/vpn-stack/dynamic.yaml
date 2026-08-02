@@ -1,7 +1,7 @@
 http:
   routers:
     dashboard:
-      rule: "Host(`homelab.akita-beaufort.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
+      rule: "Host(`homelab.akita-beaufort.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api/http`) || PathPrefix(`/api/tcp`) || PathPrefix(`/api/udp`) || PathPrefix(`/api/overview`) || PathPrefix(`/api/version`) || PathPrefix(`/api/entrypoints`) || PathPrefix(`/api/rawdata`))"
       entryPoints:
         - websecure
       tls:
@@ -10,6 +10,7 @@ http:
       middlewares:
         - dashboard-auth
         - dashboard-slash
+
   middlewares:
     dashboard-auth:
       basicAuth:

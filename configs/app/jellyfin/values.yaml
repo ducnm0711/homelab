@@ -1,0 +1,14 @@
+ingress:
+  enabled: true
+  className: tailscale
+  annotations:
+    tailscale.com/proxy-group: ingress-proxies
+  hosts:
+    - host: jellyfin.akita-beaufort.ts.net
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: jellyfin-ts-tls
+     hosts:
+       - jellyfin.akita-beaufort.ts.net
