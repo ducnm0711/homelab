@@ -74,7 +74,7 @@ services:
       - BAZARR__SERVER__URLBASE=/bazarr
     volumes:
       - /mnt/SSD/config/bazarr:/config
-      - /mnt/tier-2-hdd-stripe-test/media:/data
+      - /mnt/tier-2-hdd-stripe-test/media:/media
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.bazarr.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/bazarr`)"
