@@ -26,6 +26,10 @@
         href: https://homelab.akita-beaufort.ts.net/radarr
         icon: radarr
         description: Movie Automation
+    - Sonarr:
+        href: https://homelab.akita-beaufort.ts.net/sonarr
+        icon: sonarr
+        description: TV Series Automation
     - Bazarr:
         href: https://homelab.akita-beaufort.ts.net/bazarr
         icon: bazarr
