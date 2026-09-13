@@ -9,7 +9,7 @@ Use these steps when an SD card reader is not available. The objective is to ins
 1. Download the Rufus software and the Raspberry Pi OS (Lite) image.
 2. Use Rufus to write the Raspberry Pi OS (Lite) image to a USB flash drive.
 3. Start the Raspberry Pi 3 from the USB flash drive.
-4. Insert the SD card into the Raspberry Pi 3.
+4. Install the SD card into the Raspberry Pi 3.
 5. Find the device names for the USB flash drive and the SD card. Type this command:
    `lsblk`
 6. Copy the data from the USB flash drive to the SD card. Type this command (Change `sda` to your USB drive and `mmcblk0` to your SD card):
@@ -25,23 +25,32 @@ Use these steps when an SD card reader is not available. The objective is to ins
 The Raspberry Pi 3 has limited resources. The software stack must be small. We use an old SD card. You must keep the data footprint small to save the SD card life.
 
 ### 3.1 CLI Guide
-Use the command-line interface (CLI) to configure the network.
+Use the command-line interface (CLI) to configure the network. You can use a wired network or a wireless network.
 
-#### 3.1.1 Connection Steps
-1. Connect to a wireless network (WLAN). Type this command (Change `YourSSID` and `YourPassword` to your network data):
-   `sudo nmcli device wifi connect "YourSSID" password "YourPassword"`
-2. Set a static IP address. Type this command (Change `YourSSID` and `192.168.1.100/24` to your network data):
-   `sudo nmcli connection modify "YourSSID" ipv4.addresses 192.168.1.100/24 ipv4.method manual`
-3. Set the gateway IP address. Type this command (Change `192.168.1.1` to your router IP address):
-   `sudo nmcli connection modify "YourSSID" ipv4.gateway 192.168.1.1`
-4. Set the DNS server. Type this command:
-   `sudo nmcli connection modify "YourSSID" ipv4.dns 1.1.1.1`
-5. Restart the network connection. Type this command:
-   `sudo nmcli connection up "YourSSID"`
+**Note:** You can use the `nmtui` command. This command opens an interactive menu to configure the network instead of using single commands.
 
-#### 3.1.2 Connection Preference
-You can use a wireless network or a wired network. The user chooses the network type. This setup uses a wireless network.
-
+#### 3.1.1 Wired Connection
+```bash
+# 1. Rename profile to "wired", assign static IP, set gateway/DNS, and disable DHCP
+nmcli connection modify "Wired connection 1" connection.id "wired" ipv4.addresses "192.168.1.111/24" ipv4.gateway "192.168.1.1" ipv4.dns "192.168.1.1" ipv4.method manual
+# 2. Restart the network connection using the new profile name:
+nmcli connection up "wired"
+```
+#### 3.1.2 Wireless Connection
+```bash
+# 1. Scan for available Wi-Fi networks
+nmcli device wifi list
+# 2. Connect to a wireless network (WLAN).
+nmcli device wifi connect "YourSSID" password "YourPassword"
+# 3. Set a static IP address. Type this command (Change `YourSSID` and `192.168.1.111/24` to your network data):   
+nmcli connection modify "YourSSID" ipv4.addresses 192.168.1.111/24 ipv4.method manual
+# 4. Set the gateway IP address. Type this command (Change `192.168.1.1` to your router IP address):
+nmcli connection modify "YourSSID" ipv4.gateway 192.168.1.1
+# 5. Set the DNS server. Type this command:
+nmcli connection modify "YourSSID" ipv4.dns 192.168.1.1
+# 6. Restart the network connection:
+nmcli connection up "YourSSID"
+```
 ### 3.2 Core Services
 
 #### 3.2.1 Pi-hole
@@ -50,7 +59,7 @@ Install Pi-hole for network-wide DNS management.
 2. Open the Pi-hole configuration file. Type this command:
    `sudo nano /etc/pihole/pihole-FTL.conf`
 3. Add or change these lines to optimize data retention and the write interval:
-   `MAXDBDAYS=90`
+   `MAXDBDAYS=7`
    `DBINTERVAL=60`
 4. Save the file and restart the Pi-hole service. Type this command:
    `sudo systemctl restart pihole-FTL`
