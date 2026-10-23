@@ -1,7 +1,7 @@
 http:
   routers:
     dashboard:
-      rule: "Host(`homelab.akita-beaufort.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api/http`) || PathPrefix(`/api/tcp`) || PathPrefix(`/api/udp`) || PathPrefix(`/api/overview`) || PathPrefix(`/api/version`) || PathPrefix(`/api/entrypoints`) || PathPrefix(`/api/rawdata`))"
+      rule: "Host(`home-media.akita-beaufort.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api/http`) || PathPrefix(`/api/tcp`) || PathPrefix(`/api/udp`) || PathPrefix(`/api/overview`) || PathPrefix(`/api/version`) || PathPrefix(`/api/entrypoints`) || PathPrefix(`/api/rawdata`))"
       entryPoints:
         - websecure
       tls:
@@ -18,6 +18,6 @@ http:
           - "truenas_admin:$2y$05$yZc2oknLeQnh5nSVImOF1ugMQjFhwWB56VBypJR91iuD.yUzr0e/y"
     dashboard-slash:
       redirectRegex:
-        regex: "^https://homelab.akita-beaufort.ts.net/dashboard$"
-        replacement: "https://homelab.akita-beaufort.ts.net/dashboard/"
+        regex: "^https://home-media.akita-beaufort.ts.net/dashboard$"
+        replacement: "https://home-media.akita-beaufort.ts.net/dashboard/"
         permanent: true
