@@ -19,3 +19,12 @@ Bootstrap sonarr from localhost --> manual update Network - BaseURL /sonarr
 ---
 Bootstrap prowlarr from localhost --> manual update new user
 Bootstrap qbitorrent from localhost get boostrap session password from log --> manual update new user
+
+Setup prowlarr indexer
+
+
+Add TV Series / Movies app to Subtitle app
+Sonar --> Get API KEY
+Radaar --> Get API KEY
+
+Add API KEys to BAZARR app
