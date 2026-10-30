@@ -9,6 +9,7 @@ Design documents live in [`architecture/`](architecture/).
 - [System architecture](architecture/README.md)
 - [Storage pools](architecture/storage.md)
 - [Media stack](architecture/media-stack.md)
+- [Media rules](architecture/media-rules.md)
 - [Management SSL](architecture/ssl.md)
 
 ## Deployment

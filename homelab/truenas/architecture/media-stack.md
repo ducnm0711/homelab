@@ -4,17 +4,19 @@ Docker Compose stack for Jellyfin and media automation on TrueNAS SCALE (Portain
 
 **Traefik v3** + **Tailscale** handle HTTPS subpath routing for consumer-facing apps. A one-shot **Alpine init container** fixes Jellyfin transcode volume permissions before Jellyfin starts.
 
+Naming, cleanup, and subtitle rules are in [Media rules](media-rules.md).
+
 ---
 
 ## Services
 
 | Service | Role | Access |
 |---|---|---|
-| **permissions-fix** | One-shot init: `chown`/`chmod` on transcode volume | — |
+| **permissions-fix** | One-shot init: `chown`/`chmod` on transcode volume | None |
 | **jellyfin** | Media server / streaming | Tailnet `/jellyfin` + LAN `:8096` |
 | **radarr** | Movie automation | Tailnet `/radarr` + LAN `:7878` |
 | **sonarr** | TV automation | Tailnet `/sonarr` + LAN `:8989` |
-| **bazarr** | Subtitle automation | Tailnet `/bazarr` |
+| **bazarr** | Subtitle automation | Tailnet `/bazarr` + LAN `:6767` |
 | **prowlarr** | Indexer manager | LAN `:9696` only |
 | **qbittorrent** | Download client | LAN `:8080` + torrent `:6881` |
 
@@ -26,7 +28,7 @@ Traefik runs in the separate [`00-vpn-stack`](../deployment/00-vpn-stack); this 
 
 Only one **hard** dependency exists in Compose: Jellyfin must not start until `permissions-fix` completes successfully. Without correct ownership on the transcode volume, Jellyfin will fail at runtime.
 
-All other relationships are **soft** — services start independently and retry connections until their peers are reachable:
+All other relationships are **soft**. Services start independently and retry connections until their peers are reachable:
 
 ```text
 permissions-fix ──► jellyfin          (hard: service_completed_successfully)
@@ -47,10 +49,11 @@ radarr / sonarr ──► jellyfin           (soft: media appears when *arr impo
 | `prowlarr` | `sonarr` | Soft | Sonarr pulls indexers from Prowlarr; retries if Prowlarr is still starting |
 | `qbittorrent` | `sonarr` | Soft | Sonarr sends download jobs to qBittorrent; retries until the client responds |
 | `radarr` | `bazarr` | Soft | Bazarr reads the Radarr library for subtitle matching |
-| `radarr` | `jellyfin` | Soft | Jellyfin scans `/media` on its own schedule — no Compose gate needed |
-| `sonarr` | `jellyfin` | Soft | Jellyfin scans `/media` on its own schedule — no Compose gate needed |
+| `radarr` | `jellyfin` | Soft | Jellyfin scans `/movies` and `/series` on its own schedule. No Compose gate is needed. |
+| `sonarr` | `jellyfin` | Soft | Jellyfin scans `/movies` and `/series` on its own schedule. No Compose gate is needed. |
 
-`depends_on` entries for soft dependencies (if present) only influence start *preference*, not correctness. Every *arr app and qBittorrent is designed to wait and reconnect when upstream services come online.
+`depends_on` entries for soft dependencies (if present) only influence start *preference*, not correctness.
+Every *arr app and qBittorrent is designed to wait and reconnect when upstream services come online.
 
 ---
 
@@ -68,7 +71,7 @@ radarr / sonarr ──► jellyfin           (soft: media appears when *arr impo
 └──────────────────────────┬──────────────────────────┘
                            │ (reads)
 ═══════════════════════════▼═══════════════════════════
-     TrueNAS Dataset:  /mnt/tier-2-hdd-stripe-test/media
+     TrueNAS Datasets: /mnt/media-01, /mnt/media-02
 ═══════════════════════════▲═══════════════════════════
                            │ (hardlinks / moves)
 ┌──────────────────────────┴──────────────────────────┐
@@ -96,7 +99,9 @@ radarr / sonarr ──► jellyfin           (soft: media appears when *arr impo
 |---|---|
 | Jellyfin, Radarr, Sonarr, Bazarr | Prowlarr, qBittorrent |
 
-Prowlarr holds indexer credentials; qBittorrent controls downloads — both stay off the tailnet.
+Prowlarr holds indexer credentials.
+qBittorrent controls downloads.
+Both stay off the tailnet.
 
 ---
 
@@ -104,8 +109,8 @@ Prowlarr holds indexer credentials; qBittorrent controls downloads — both stay
 
 * **Host OS:** TrueNAS SCALE
 * **Deployment:** Docker Compose via Portainer
-* **Media server:** Jellyfin `10.11.11`
-* **Proxy / SSL:** Traefik v3 + Tailscale (`homelab.akita-beaufort.ts.net`)
+* **Media server:** Jellyfin `12.3`
+* **Proxy / SSL:** Traefik v3 + Tailscale (`home-media.akita-beaufort.ts.net`)
 * **Permissions:** Alpine init container (`permissions-fix`)
 
 ---
