@@ -1,5 +1,4 @@
 .dev
-.local/
 *.tgz
 .vscode
 .DS_Store
