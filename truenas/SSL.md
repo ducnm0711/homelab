@@ -1,3 +1,3 @@
 Generate cert for Management UI
 
-tailscale cert truenas.akita-beaufort.ts.net
+tailscale cert home-nas-server-01.akita-beaufort.ts.net
