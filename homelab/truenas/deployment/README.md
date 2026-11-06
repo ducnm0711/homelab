@@ -2,6 +2,19 @@
 
 Use these steps to deploy the TrueNAS stacks through Portainer.
 
+## Port policy
+
+Traefik owns the edge inside the Tailscale network namespace.
+Traefik listens on ports `80` and `443`.
+No application publishes its web UI on a host port.
+Each application documents its internal port with `expose`.
+Traefik routes each application with the `loadbalancer.server.port` label.
+
+Two exceptions are approved:
+
+- qBittorrent publishes `6881/tcp` and `6881/udp` for torrent peers.
+- Portainer uses a temporary host port only for break-glass access.
+
 ## 1. Create the proxy network
 
 ```bash
@@ -31,14 +44,17 @@ chown -R 568:568 /mnt/fast/app
 
 ## 4. Bootstrap the applications
 
-Bootstrap each application from `localhost`.
-Then set its base URL.
+Open each application through its Tailscale route.
+The routes use the `home-media.akita-beaufort.ts.net` host.
 
-- Jellyfin: set the base URL to `/jellyfin`.
-- Radarr: set the base URL to `/radarr`.
-- Sonarr: set the base URL to `/sonarr`.
-- Prowlarr: create a new user.
-- qBittorrent: read the temporary password from the log, then create a new user.
+- Jellyfin: open `/jellyfin`.
+- Radarr: open `/radarr`.
+- Sonarr: open `/sonarr`.
+- Bazarr: open `/bazarr`.
+- Prowlarr: open `/prowlarr`, then create a new user.
+- qBittorrent: open `/qbittorrent`, read the temporary password from the container log, then create a new user.
+
+The compose file sets the base URL for Jellyfin, Radarr, Sonarr, Bazarr, and Prowlarr.
 
 ## 5. Connect the applications
 
@@ -46,3 +62,19 @@ Then set its base URL.
 2. Copy the API key from Sonarr.
 3. Copy the API key from Radarr.
 4. Add both API keys to Bazarr.
+
+## Break-glass Portainer access
+
+Use this procedure when the Tailscale route or Traefik is not available.
+
+1. Open the TrueNAS Apps page.
+2. Edit the Portainer app.
+3. Add the port mapping `9000:9000`.
+4. Apply the change.
+5. Open `http://<truenas-lan-ip>:9000/portainer/` from the LAN.
+6. Repair the affected stack or network.
+7. Remove the port mapping.
+8. Apply the change again.
+
+This procedure temporarily weakens the zero-port policy.
+Remove the mapping after the repair.

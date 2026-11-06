@@ -13,6 +13,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - tailscale-sock:/var/run/tailscale:rw
       - /mnt/fast/app/traefik/dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+    expose:
+      - "80"
+      - "443"
     command:
       - "--api.dashboard=true"
       - "--api.insecure=true"
@@ -64,8 +67,11 @@ services:
       - /mnt/fast/app/homepage:/app/config
       # Optional: Allows Homepage to read Docker states for its widget integrations
       - /var/run/docker.sock:/var/run/docker.sock:ro 
+    expose:
+      - "3000"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       # Using the same domain you used for the hello container
       - "traefik.http.routers.homepage.rule=Host(`home-media.akita-beaufort.ts.net`)"
       - "traefik.http.routers.homepage.entrypoints=websecure"

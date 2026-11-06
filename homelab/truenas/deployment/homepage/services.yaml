@@ -34,13 +34,11 @@
         href: https://home-media.akita-beaufort.ts.net/bazarr
         icon: bazarr
         description: Subtitle Automation
-
-- LAN Access Only:
     - Prowlarr:
-        href: http://homelab.local:9696
+        href: https://home-media.akita-beaufort.ts.net/prowlarr
         icon: prowlarr
-        description: Indexer Manager — LAN only
+        description: Indexer Manager
     - qBittorrent:
-        href: http://homelab.local:8080
+        href: https://home-media.akita-beaufort.ts.net/qbittorrent
         icon: qbittorrent
-        description: Download Client — LAN only
+        description: Download Client

@@ -1,0 +1,41 @@
+# Authelia SSO stack - deploy as a Portainer stack.
+# Prereqs: external network `proxy` exists; config + secrets prepared in
+# /mnt/fast/app/authelia/ (see authelia-configuration.yml header).
+
+services:
+  authelia:
+    image: authelia/authelia:4.39   # pin to the exact current tag you verify
+    container_name: authelia
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      X_AUTHELIA_CONFIG_FILTERS: template
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /config/secrets/jwt_secret
+      AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session_secret
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/storage_key
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /config/secrets/oidc_hmac
+    volumes:
+      - /mnt/fast/app/authelia:/config
+    networks:
+      - proxy
+    expose:
+      - "9091"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # Authelia portal at /authelia (no stripPrefix: Authelia serves under that path itself)
+      - "traefik.http.routers.authelia.rule=Host(`homelab.akita-beaufort.ts.net`) && PathPrefix(`/authelia`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls=true"
+      - "traefik.http.routers.authelia.tls.certresolver=tailscale"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+
+      # Forward-auth middleware, referenced elsewhere as `authelia@docker`
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/authelia/api/authz/forward-auth"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name"
+
+networks:
+  proxy:
+    external: true
