@@ -1,0 +1,7 @@
+# /mnt/fast/app/authelia/config/users.yml
+users:
+  fiery:
+    displayname: Fiery
+    password: '$6$BJivc4s3RD7GkinW$i9LDzTgsARLgz1jigT7CE8Btl1t0UBkuaJ4pW.5yMm0VAlm67YISIjqq.M27.B5BfNxkYg/2qWANT180ykUdk0'
+    email: admin@homelab.local
+    groups: [admins]

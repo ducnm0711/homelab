@@ -86,6 +86,8 @@ services:
       - "traefik.http.routers.homepage.tls=true"
       - "traefik.http.routers.homepage.tls.certresolver=tailscale"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+      - "traefik.http.routers.homepage.middlewares=authelia@docker"
+      # - "traefik.http.routers.homepage.middlewares=setup-auth@file"
 
 volumes:
   tailscale-home-media-state:
