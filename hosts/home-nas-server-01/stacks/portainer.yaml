@@ -40,6 +40,7 @@ services:
         PathPrefix(`/portainer/`)
       - "traefik.http.middlewares.portainer-strip.stripprefix.prefixes=/portainer"
       - "traefik.http.routers.portainer.middlewares=portainer-strip"
+      # - "traefik.http.routers.portainer.middlewares=setup-auth@file,portainer-strip"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=tailscale"
