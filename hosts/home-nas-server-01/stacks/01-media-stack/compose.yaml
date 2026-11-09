@@ -59,6 +59,26 @@ services:
       - 8080:8080       # Web UI (Local LAN Access)
       - 6881:6881       # Torrent TCP
       - 6881:6881/udp   # Torrent UDP
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+      - "traefik.http.routers.qbittorrent.rule=Host(`home-media.akita-beaufort.ts.net`) && (Path(`/qbittorrent`) || PathPrefix(`/qbittorrent/`))"
+      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "traefik.http.routers.qbittorrent.tls.certresolver=tailscale"
+      # Single middlewares line: auth -> redirect -> strip -> headers
+      - "traefik.http.routers.qbittorrent.middlewares=authelia@docker,qbt-redirect,qbt-stripprefix,qbt-headers"
+
+      # Redirect /qbittorrent -> /qbittorrent/ (note $$ escaping in compose)
+      - "traefik.http.middlewares.qbt-redirect.redirectregex.regex=^(https?://[^/]+)/qbittorrent$$"
+      - "traefik.http.middlewares.qbt-redirect.redirectregex.replacement=$${1}/qbittorrent/"
+      - "traefik.http.middlewares.qbt-redirect.redirectregex.permanent=true"
+
+      - "traefik.http.middlewares.qbt-stripprefix.stripprefix.prefixes=/qbittorrent"
+
+      - "traefik.http.middlewares.qbt-headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.qbt-headers.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.qbt-headers.headers.customrequestheaders.Origin="
     restart: unless-stopped
 
   # --- TIER 02: INDEXER HUB ---
