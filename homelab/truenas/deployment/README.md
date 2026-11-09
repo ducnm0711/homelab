@@ -129,27 +129,40 @@ Continue to the auth stack only after the media stack works.
 The auth stack is in [02-auth-stack/](02-auth-stack/).
 It runs Authelia as a Traefik forward-auth provider.
 
-Create the config and secrets directories.
-Set the owner to UID/GID 568:
+Create the config and secrets directories:
 
 ```bash
-mkdir -p /mnt/fast/app/authelia/config/secrets
-chown -R 568:568 /mnt/fast/app/authelia/config
+mkdir -p /mnt/fast/app/authelia/secrets
 ```
 
 Copy the config files:
 
 ```bash
-cp 02-auth-stack/configuration.yml /mnt/fast/app/authelia/config/configuration.yml
-cp 02-auth-stack/users.yml /mnt/fast/app/authelia/config/users.yml
+cp 02-auth-stack/configuration.yml /mnt/fast/app/authelia/configuration.yml
+cp 02-auth-stack/users.yml /mnt/fast/app/authelia/users.yml
 ```
 
-Generate the session secret and the storage key:
+Generate the session secret, the storage key, and the OIDC HMAC secret:
 
 ```bash
-openssl rand -hex 32 > /mnt/fast/app/authelia/config/secrets/session_secret
-openssl rand -hex 32 > /mnt/fast/app/authelia/config/secrets/storage_key
-chown 568:568 /mnt/fast/app/authelia/config/secrets/session_secret /mnt/fast/app/authelia/config/secrets/storage_key
+openssl rand -hex 32 > /mnt/fast/app/authelia/secrets/session_secret
+openssl rand -hex 32 > /mnt/fast/app/authelia/secrets/storage_key
+openssl rand -hex 32 > /mnt/fast/app/authelia/secrets/hmac_secret
+```
+
+Set the owner to UID/GID 568 and restrict the secret files:
+
+```bash
+chown -R 568:568 /mnt/fast/app/authelia
+chmod 600 /mnt/fast/app/authelia/secrets/*
+```
+
+The `configuration.yml` file reads the HMAC secret from `secrets/hmac_secret`.
+The `configuration.yml` file uses the `secret` template function.
+The Authelia service must set this environment variable:
+
+```yaml
+X_AUTHELIA_CONFIG_FILTERS: template
 ```
 
 Generate a password hash for each user:
@@ -158,7 +171,16 @@ Generate a password hash for each user:
 docker run --rm authelia/authelia:4.39 authelia crypto hash generate argon2 --password 'your-password'
 ```
 
-Add the digest and the user details to `/mnt/fast/app/authelia/config/users.yml`.
+Add the digest and the user details to `/mnt/fast/app/authelia/users.yml`.
+Set the user groups for Jellyfin access:
+
+```yaml
+groups: [admins, jellyfin-users]
+```
+
+The `jellyfin-users` group is the normal Jellyfin login role.
+The `admins` group is the Jellyfin admin role.
+Do not commit secrets to git.
 
 Deploy `02-auth-stack` as a Portainer stack.
 The setup basic auth still protects the Tailscale routes.
@@ -191,7 +213,7 @@ After login, Authelia sends the user headers to the application.
 | Radarr | `/radarr` | Basic auth | Authelia | External |
 | Sonarr | `/sonarr` | Basic auth | Authelia | External |
 | Bazarr | `/bazarr` | Basic auth | Authelia | None |
-| Jellyfin | `/jellyfin` | Basic auth | `[TO-DO]` SSO | Native until SSO |
+| Jellyfin | `/jellyfin` | Basic auth | SSO Authentication plugin | Authelia via SSO Authentication |
 | Prowlarr | LAN only | Native LAN login | Native LAN login | Native |
 | qBittorrent | LAN only | Native LAN login | Native LAN login | Native |
 | Portainer | `/portainer/` | Basic auth | `[TO-DO]` SSO | Native until SSO |
@@ -215,6 +237,7 @@ For each route:
 
 Do not change Jellyfin or Portainer in this step.
 Keep the `setup-auth@file` middleware on both.
+Complete section 8 before you remove the setup gate from Jellyfin.
 
 ### Radarr and Sonarr
 
@@ -269,17 +292,155 @@ If the client cannot use a session cookie, add a separate router for the API pat
 Use a higher priority for the API router.
 Do not add the `authelia@docker` middleware to the API router.
 
-## 8. [TO-DO] SSO for Jellyfin and Portainer
+## 8. SSO for Jellyfin
 
-Jellyfin and Portainer keep `setup-auth@file` until SSO is ready.
-Do not remove the `setup` user yet.
+Jellyfin uses the SSO Authentication plugin from the [K0lin repository](https://github.com/K0lin/jellyfin-plugin-sso).
+The plugin version is `5.1.1`.
+Plugin version 5.1 and later requires Jellyfin 12.0 or later.
+The media stack runs Jellyfin 12.3.
+The 9p4 manifest currently serves version `4.0.0.4` for Jellyfin 10.11.
+Do not use the 9p4 manifest with Jellyfin 12.3.
+Keep the `setup` basic auth gate until the SSO login works.
 
-Jellyfin needs an Authelia OIDC client and the Jellyfin SSO-Auth plugin.
+### Prepare the Authelia OIDC client
+
+The Authelia OIDC client is in `02-auth-stack/configuration.yml`.
+The client ID is `jellyfin`.
+The redirect URI is `https://home-media.akita-beaufort.ts.net/jellyfin/sso/OID/redirect/authelia`.
+The client requests the `openid`, `profile`, `email`, and `groups` scopes.
+The client uses `client_secret_post` for token endpoint authentication.
+The access control bypass list in `configuration.yml` must include `^/jellyfin(/.*)?$`.
+The bypass lets the SSO plugin start the Authelia login flow.
+
+Generate the OIDC signing key and the client secret:
+
+```bash
+openssl genpkey -algorithm RSA -out /mnt/fast/app/authelia/secrets/oidc.pem -pkeyopt rsa_keygen_bits:4096
+openssl rand -hex 32 > /mnt/fast/app/authelia/secrets/jellyfin_client_secret
+chown 568:568 /mnt/fast/app/authelia/secrets/oidc.pem /mnt/fast/app/authelia/secrets/jellyfin_client_secret
+chmod 600 /mnt/fast/app/authelia/secrets/oidc.pem /mnt/fast/app/authelia/secrets/jellyfin_client_secret
+```
+
+Do not use a short or simple client secret.
+
+Deploy or restart `02-auth-stack`.
+Confirm that Authelia starts without errors:
+
+```bash
+docker logs authelia
+```
+
+Confirm that Authelia serves the discovery document:
+
+```bash
+curl -fsS https://home-media.akita-beaufort.ts.net/auth/.well-known/openid-configuration
+```
+
+### Install the SSO Authentication plugin
+
+1. Open the Jellyfin dashboard.
+2. Open `Plugins > Repositories`.
+3. Add this repository URL:
+
+   ```text
+   https://raw.githubusercontent.com/k0lin/jellyfin-plugin-sso/manifest-release/manifest.json
+   ```
+
+4. Open `Plugins > Catalog`.
+5. Install `SSO Authentication` version `5.1.1`.
+6. Restart Jellyfin.
+7. Confirm that `/mnt/fast/app/jellyfin/plugins/SSO-Auth` is owned by UID/GID 568.
+
+### Configure the Authelia provider
+
+1. Open `Dashboard > Plugins` and select the `SSO Authentication` settings page.
+2. Add a provider with these values:
+
+   | Field | Value |
+   | :--- | :--- |
+   | Name of OpenID Provider | `authelia` |
+   | OpenID Endpoint | `https://home-media.akita-beaufort.ts.net/auth` |
+   | OpenID Client ID | `jellyfin` |
+   | OpenID client secret | The contents of `jellyfin_client_secret` |
+   | Enabled | Checked |
+   | Enable Authorization by Plugin | Checked |
+   | Enable All Folders | Checked |
+   | Roles | `jellyfin-users` |
+   | Admin Roles | `admins` |
+   | Preserve Existing Admin Permissions | Checked |
+   | Role Claim | `groups` |
+   | OIDC Scopes | `groups` |
+   | Disable Pushed Authorization (Insecure) | Checked if Authelia logs a method mismatch |
+   | Scheme Override | `https` |
+
+   The provider name `authelia` must match the last part of the Authelia redirect URI.
+   Leave `Enable Authorization by Plugin` unchecked at first if an existing administrator account is not protected.
+   A plugin login can overwrite the permissions of an account with the same name.
+   Enable `Preserve Existing Admin Permissions` before you enable plugin authorization.
+   The `Disable Pushed Authorization (Insecure)` option may be needed for Authelia.
+   Enable it if Authelia logs a method mismatch between the push request and the token request.
+
+3. Save the settings.
+4. Restart Jellyfin.
+
+### Add the login button
+
+1. Open `Dashboard > General`.
+2. Open `Branding`.
+3. Put this text in the `Login disclaimer` field:
+
+   ```html
+   <a href="/jellyfin/sso/OID/start/authelia">Sign in with Authelia</a>
+   ```
+
+4. Save the settings.
+
+The provider name in the URL must match `authelia`.
+
+### Test the login
+
+1. Open a private browser window.
+2. Open `https://home-media.akita-beaufort.ts.net/jellyfin`.
+3. Click `Sign in with Authelia`.
+4. Sign in with the Authelia user.
+5. Click `Accept`.
+6. Confirm that Jellyfin opens with your user.
+7. Confirm that the local Jellyfin administrator login still works.
+8. Link an existing Jellyfin user at `/jellyfin/SSOViews/linking` if the plugin creates a second account.
+
+### After the test
+
+Set `log.level` back to `info` if you changed it.
+Keep the local Jellyfin administrator account for recovery.
+Do not put secrets in git.
+
+### Remove the setup gate
+
+Remove `setup-auth@file` from the Jellyfin router if it is present.
+Do not add `authelia@docker` to the Jellyfin router.
+The SSO Authentication plugin handles the login.
+Keep the `^/jellyfin(/.*)?$` bypass rule in the Authelia access control list.
+The bypass lets the plugin redirect to Authelia without a second forward-auth gate.
+
+Remove the `setup` user only after Jellyfin and Portainer both use SSO.
+
+### Troubleshooting
+
+- `invalid_client`: The client secret in the plugin does not match `jellyfin_client_secret`.
+- `redirect_uri` error: The redirect URI does not match the Authelia client configuration.
+- Pushed authorization error: Enable `Disable Pushed Authorization (Insecure)`.
+- Method mismatch: Authelia reports a method mismatch between the push request and the token request.
+  Enable `Disable Pushed Authorization (Insecure)` and save.
+- Discovery error: Enable `Do Not Validate OpenID Endpoints (Insecure)`.
+- Jellyfin cannot reach Authelia: Check the DNS alias or the `extra_hosts` entry.
+- Login loop: Check the `/jellyfin` bypass rule and remove any forward-auth middleware from the Jellyfin router.
+
+## 9. [TO-DO] SSO for Portainer
+
+Portainer keeps the `setup` basic auth gate until SSO is ready.
 Portainer needs an Authelia OIDC client.
-Add both clients to the Authelia identity provider configuration.
-
-After both integrations work, replace `setup-auth@file` with the SSO configuration.
-Then remove the `setup-auth` middleware and the `setup` user.
+Add the client to the Authelia identity provider configuration.
+Remove the `setup` user only after the Portainer SSO login works.
 
 ## Break-glass Portainer access
 

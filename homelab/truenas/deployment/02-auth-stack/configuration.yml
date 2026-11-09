@@ -1,10 +1,3 @@
-# Place at /mnt/fast/app/authelia/config/configuration.yml
-#
-# Also needed in /mnt/fast/app/authelia/config/ (readable by uid 568):
-#   users.yml
-#   secrets/session_secret   openssl rand -hex 32
-#   secrets/storage_key      openssl rand -hex 32
-
 theme: auto
 
 server:
@@ -26,6 +19,7 @@ access_control:
       policy: bypass
       resources:
         - '^/auth(/.*)?$'
+        - '^/jellyfin(/.*)?$'     # Jellyfin uses the SSO plugin for login
     - domain: home-media.akita-beaufort.ts.net
       policy: one_factor
 
@@ -44,3 +38,19 @@ storage:
 notifier:
   filesystem:
     filename: /config/notification.txt
+
+identity_providers:
+  oidc:
+    jwks:
+      - key: {{ secret "/config/secrets/oidc.pem" | mindent 10 "|" | msquote }}
+    clients:
+      - client_id: jellyfin
+        client_name: Jellyfin
+        client_secret: '$plaintext${{ secret "/config/secrets/jellyfin_client_secret" }}'
+        public: false
+        authorization_policy: one_factor
+        require_pkce: false
+        redirect_uris:
+          - https://home-media.akita-beaufort.ts.net/jellyfin/sso/OID/redirect/authelia
+        scopes: [openid, profile, email, groups]
+        token_endpoint_auth_method: client_secret_post

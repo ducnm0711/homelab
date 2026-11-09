@@ -45,6 +45,10 @@
         href: https://home-media.akita-beaufort.ts.net/bazarr
         icon: bazarr
         description: Subtitle Automation
+    - qBittorrent:
+        href: https://home-media.akita-beaufort.ts.net/qbittorrent
+        icon: qbittorrent
+        description: Download Client
 
 - LAN Access Only:
     - Prowlarr:

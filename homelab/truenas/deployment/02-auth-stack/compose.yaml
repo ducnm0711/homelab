@@ -1,6 +1,4 @@
 # Authelia - forward-auth only (step 1: Homepage). Deploy as a Portainer stack.
-# Prereqs: external network `proxy` exists; config + secrets in /mnt/fast/app/authelia/config/
-# (see configuration.yml header).
 
 services:
   authelia:
@@ -10,8 +8,10 @@ services:
     user: "568:568"
     environment:
       TZ: Etc/GMT-7
+      X_AUTHELIA_CONFIG_FILTERS: template
       AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session_secret
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/storage_key
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /config/secrets/oidc_hmac
     volumes:
       - /mnt/fast/app/authelia:/config
     networks:
