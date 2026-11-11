@@ -1,0 +1,56 @@
+theme: auto
+
+server:
+  address: 'tcp://:9091/auth'
+
+log:
+  level: info
+
+authentication_backend:
+  file:
+    path: /config/users.yml
+  password_reset:
+    disable: true
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: home-media.akita-beaufort.ts.net
+      policy: bypass
+      resources:
+        - '^/auth(/.*)?$'
+        - '^/jellyfin(/.*)?$'     # Jellyfin uses the SSO plugin for login
+    - domain: home-media.akita-beaufort.ts.net
+      policy: one_factor
+
+session:
+  cookies:
+    - domain: home-media.akita-beaufort.ts.net
+      authelia_url: https://home-media.akita-beaufort.ts.net/auth
+      default_redirection_url: https://home-media.akita-beaufort.ts.net/
+      expiration: 12h
+      inactivity: 2h
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+identity_providers:
+  oidc:
+    jwks:
+      - key: {{ secret "/config/secrets/oidc.pem" | mindent 10 "|" | msquote }}
+    clients:
+      - client_id: jellyfin
+        client_name: Jellyfin
+        client_secret: '$plaintext${{ secret "/config/secrets/jellyfin_client_secret" }}'
+        public: false
+        authorization_policy: one_factor
+        require_pkce: false
+        redirect_uris:
+          - https://home-media.akita-beaufort.ts.net/jellyfin/sso/OID/redirect/authelia
+        scopes: [openid, profile, email, groups]
+        token_endpoint_auth_method: client_secret_post

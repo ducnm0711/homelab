@@ -8,14 +8,23 @@ http:
         certResolver: tailscale
       service: api@internal
       middlewares:
-        - dashboard-auth
+        - authelia@docker
+        # - setup-auth@file
         - dashboard-slash
+        # - dashboard-auth
 
   middlewares:
-    dashboard-auth:
-      basicAuth:
-        users:
-          - "truenas_admin:$2y$05$yZc2oknLeQnh5nSVImOF1ugMQjFhwWB56VBypJR91iuD.yUzr0e/y"
+    # Temporary setup gate. Enable during media setup, then remove after the SSO rollout.
+    # Generate the hash with:
+    # docker run --rm httpd:alpine htpasswd -nbB setup 'your-password'
+    # setup-auth:
+    #   basicAuth:
+    #     users:
+    #       - "setup:$2y$..."
+    # dashboard-auth:
+    #   basicAuth:
+    #     users:
+    #       - "truenas_admin:$2y$05$yZc2oknLeQnh5nSVImOF1ugMQjFhwWB56VBypJR91iuD.yUzr0e/y"
     dashboard-slash:
       redirectRegex:
         regex: "^https://home-media.akita-beaufort.ts.net/dashboard$"

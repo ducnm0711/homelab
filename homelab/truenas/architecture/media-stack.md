@@ -13,12 +13,12 @@ Naming, cleanup, and subtitle rules are in [Media rules](media-rules.md).
 | Service | Role | Access |
 |---|---|---|
 | **permissions-fix** | One-shot init: `chown`/`chmod` on transcode volume | None |
-| **jellyfin** | Media server / streaming | Tailnet `/jellyfin` + LAN `:8096` |
-| **radarr** | Movie automation | Tailnet `/radarr` + LAN `:7878` |
-| **sonarr** | TV automation | Tailnet `/sonarr` + LAN `:8989` |
-| **bazarr** | Subtitle automation | Tailnet `/bazarr` + LAN `:6767` |
-| **prowlarr** | Indexer manager | LAN `:9696` only |
-| **qbittorrent** | Download client | LAN `:8080` + torrent `:6881` |
+| **jellyfin** | Media server / streaming | Tailnet `/jellyfin` |
+| **radarr** | Movie automation | Tailnet `/radarr` |
+| **sonarr** | TV automation | Tailnet `/sonarr` |
+| **bazarr** | Subtitle automation | Tailnet `/bazarr` |
+| **prowlarr** | Indexer manager | Tailnet `/prowlarr` |
+| **qbittorrent** | Download client | Tailnet `/qbittorrent` + torrent `6881` |
 
 Traefik runs in the separate [`00-vpn-stack`](../deployment/00-vpn-stack); this stack joins its external `proxy` network.
 
@@ -95,13 +95,19 @@ Every *arr app and qBittorrent is designed to wait and reconnect when upstream s
 
 ### Network exposure
 
-| Tailnet (Traefik) | LAN only |
-|---|---|
-| Jellyfin, Radarr, Sonarr, Bazarr | Prowlarr, qBittorrent |
+All application web UIs use Traefik over Tailscale.
+No application publishes a web UI on a host port.
 
-Prowlarr holds indexer credentials.
-qBittorrent controls downloads.
-Both stay off the tailnet.
+| Service | Route |
+|---|---|
+| Jellyfin | `/jellyfin` |
+| Radarr | `/radarr` |
+| Sonarr | `/sonarr` |
+| Bazarr | `/bazarr` |
+| Prowlarr | `/prowlarr` |
+| qBittorrent | `/qbittorrent` |
+
+qBittorrent also publishes `6881/tcp` and `6881/udp` for torrent peers.
 
 ---
 

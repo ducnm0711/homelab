@@ -33,22 +33,23 @@ services:
       disable: True
     image: portainer/portainer-ce:2.45.3
     labels:
-      - traefik.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - >-
         traefik.http.routers.portainer.rule=Path(`/portainer`) ||
         PathPrefix(`/portainer/`)
-      - traefik.http.middlewares.portainer-strip.stripprefix.prefixes=/portainer
-      - traefik.http.routers.portainer.middlewares=portainer-strip
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
-      - traefik.http.routers.portainer.tls=true
+      - "traefik.http.middlewares.portainer-strip.stripprefix.prefixes=/portainer"
+      - "traefik.http.routers.portainer.middlewares=portainer-strip"
+      # - "traefik.http.routers.portainer.middlewares=setup-auth@file,portainer-strip"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=tailscale"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
       - proxy
     platform: linux/amd64
-    ports:
-      - mode: ingress
-        protocol: tcp
-        published: 9000
-        target: 9000
+    expose:
+      - "9000"
     privileged: False
     restart: unless-stopped
     security_opt:
@@ -117,8 +118,8 @@ x-notes: >
 
   https://github.com/truenas/apps
 x-portals:
-  - host: 0.0.0.0
+  - host: home-media.akita-beaufort.ts.net
     name: HTTPS
-    path: /
-    port: 9000
+    path: /portainer/
+    port: 443
     scheme: https
