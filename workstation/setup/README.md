@@ -1,6 +1,6 @@
-# Local setup
+# Workstation setup
 
-Base tooling required on a developer machine before the homelab labs.
+Base tooling required on the workstation.
 
 ## Automated setup
 
@@ -10,7 +10,9 @@ Run the bootstrap script:
 ./bootstrap.sh
 ```
 
-The script installs the Brewfile packages, the Helm plugins, the AGE key, and the k3d clusters.
+The script installs the Brewfile packages, the Helm plugins, and the AGE key.
+The Brewfile also installs fzf, Starship, Zed, and the Fira Code Nerd Font.
+See [../shell/README.md](../shell/README.md) for the shell setup.
 
 ## Manual setup
 
@@ -30,12 +32,8 @@ helm plugin install https://github.com/databus23/helm-diff
 helm plugin install https://github.com/jkroepke/helm-secrets
 ```
 
-Create k3d clusters:
-
-```bash
-k3d cluster create lab-dev
-k3d cluster create lab-prd --agents 2
-```
+Start the Kubernetes lab when you need it.
+See [../../k8s-lab/README.md](../../k8s-lab/README.md).
 
 Generate an AGE key pair:
 

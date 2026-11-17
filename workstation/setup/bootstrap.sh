@@ -18,8 +18,6 @@ if [[ ! -f "$HOME/.config/sops/age/keys.txt" ]]; then
   age-keygen -o "$HOME/.config/sops/age/keys.txt"
 fi
 
-k3d cluster list | grep -q '^lab-dev' || k3d cluster create lab-dev
-k3d cluster list | grep -q '^lab-prd' || k3d cluster create lab-prd --agents 2
-
+echo "Start the Kubernetes lab when you need it. See k8s-lab/README.md."
 echo "Add this to your shell profile:"
 echo 'export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"'

@@ -1,7 +1,15 @@
-# k3d labs
+# Kubernetes lab
 
-This directory holds the local Kubernetes labs.
-The labs run on k3d on macOS (OrbStack) or Windows 11 (WSL2).
+This directory holds the on-demand Kubernetes lab.
+The lab runs on k3d on macOS (OrbStack) or Windows 11 (WSL2).
+
+## Status
+
+At the point this document was written, the Kubernetes lab is deployed as a minimal on-demand environment on the local workstation.
+Start the cluster only when you need it.
+
+The workstation setup installs k3d, Helm, and Helmfile.
+See [../workstation/setup/README.md](../workstation/setup/README.md).
 
 ## Profiles
 
