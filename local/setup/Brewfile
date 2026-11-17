@@ -1,7 +1,0 @@
-brew "age"
-brew "helm"
-brew "helmfile"
-brew "k3d"
-brew "k9s"
-brew "sops"
-cask "orbstack"

@@ -1,18 +1,23 @@
 # Homelab
 
-This repository has two independent parts.
+This repository has three independent parts.
 Each part has its own lifecycle and tooling.
 
 | Domain | Purpose | Entry point |
 | :--- | :--- | :--- |
-| Local machines | Laptop setup, shell, and k3d labs. | [local/](local/README.md) |
+| Workstation | Laptop setup, shell, and editor settings. | [workstation/](workstation/README.md) |
+| Kubernetes lab | On-demand local Kubernetes lab with k3d. | [k8s-lab/](k8s-lab/README.md) |
 | Homelab systems | TrueNAS server and Raspberry Pi server. | [homelab/](homelab/README.md) |
 
-## Local machines
+## Workstation
 
-The `local/` directory holds the setup for my workstation.
-It includes shell configuration, bootstrap scripts, and the k3d Kubernetes labs.
-The labs use Helmfile, Helm charts, SOPS, and raw manifests.
+The `workstation/` directory holds the setup for my workstation.
+It includes shell configuration, bootstrap scripts, and editor settings.
+
+## Kubernetes lab
+
+The `k8s-lab/` directory holds the on-demand Kubernetes lab.
+It uses k3d, Helmfile, Helm charts, SOPS, and raw manifests.
 
 ## Homelab systems
 
@@ -23,5 +28,5 @@ The Raspberry Pi runs Pi-hole and DNSCrypt-proxy.
 
 ## Rules
 
-All writing follows [rules/writing.md](rules/writing.md).
+All writing follows [99-rules/writing.md](99-rules/writing.md).
 Agents follow [AGENTS.md](AGENTS.md).

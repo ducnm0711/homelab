@@ -1,0 +1,68 @@
+# ==============================================================================
+# Legend:
+#   [MANDATORY] - Core runtime, CLI, or engine required for daily workflow
+#   [OPTIONAL]  - Quality-of-life, cosmetic, or task-specific helper
+#
+# Sorting: [MANDATORY] first (alphabetical by package name), then [OPTIONAL] (alphabetical)
+# Install age and sops with ./bootstrap.sh --with-secrets (Brewfile.secrets).
+# ==============================================================================
+
+# ==========================================
+# 1. Terminal, Shell & Core CLI
+# ==========================================
+brew "gh"                       # [MANDATORY] Core: GitHub CLI for pull requests, issues, and auth
+brew "git"                      # [MANDATORY] Core: Up-to-date Git (avoids the outdated Apple Xcode CLT version)
+brew "yq"                       # [MANDATORY] Core: YAML, JSON, and XML parser for manifests
+brew "fzf"                      # [OPTIONAL]  QoL: Interactive fuzzy finder for history and files
+cask "font-fira-code-nerd-font" # [OPTIONAL]  Cosmetic: Ligatures and glyph icons for Starship
+cask "ghostty"                  # [OPTIONAL]  Cosmetic/QoL: GPU terminal, with macOS Terminal.app as fallback
+brew "starship"                 # [OPTIONAL]  Cosmetic/QoL: Custom shell prompt
+brew "tree"                     # [OPTIONAL]  QoL: Visual directory tree output
+brew "watch"                    # [OPTIONAL]  QoL: Periodic command runner
+brew "zsh-completions"          # [OPTIONAL]  QoL: Extra tab-completion definitions
+
+# ==========================================
+# 2. Containers (Pick One Runtime)
+# ==========================================
+cask "orbstack"                 # [MANDATORY] Core: Docker daemon, CLI, and Linux VMs (recommended)
+# brew "colima"                 # [OPTIONAL]  Alternative: Open-source lightweight container runtime
+# cask "docker-desktop"         # [OPTIONAL]  Alternative: Official Docker Desktop GUI and engine
+# brew "podman"                 # [OPTIONAL]  Alternative: Daemonless container engine
+
+# ==========================================
+# 3. Kubernetes
+# ==========================================
+brew "helm"                     # [MANDATORY] Core: Helm CLI and plugin host
+brew "helmfile"                 # [MANDATORY] Core: Declarative Helm chart deployments
+brew "kubernetes-cli"           # [MANDATORY] Core: Official kubectl CLI
+brew "k3d"                      # [OPTIONAL]  Task-specific: Local multi-node k3s clusters in Docker
+brew "k9s"                      # [OPTIONAL]  QoL: Terminal UI for Kubernetes clusters
+brew "kubectx"                  # [OPTIONAL]  QoL: Fast context and namespace switching
+brew "velero"                   # [OPTIONAL]  Task-specific: Kubernetes backup and migration
+
+# ==========================================
+# 4. Cloud Infrastructure
+# ==========================================
+brew "awscli"                   # [MANDATORY] Core: Official AWS CLI
+cask "gcloud-cli"               # [MANDATORY] Core: Google Cloud CLI
+
+# ==========================================
+# 5. Security, Secrets & TLS
+# ==========================================
+brew "gnupg"                    # [MANDATORY] Core: GPG CLI for signing and SOPS
+brew "openssl@3"                # [MANDATORY] Core: Inspect certificates, CSRs, and TLS handshakes
+brew "pinentry-mac"             # [MANDATORY] Core: macOS Keychain passphrase dialog for gpg-agent
+
+# ==========================================
+# 6. Runtimes & Network Utilities
+# ==========================================
+brew "uv"                       # [MANDATORY] Core: Python package and virtual environment manager
+brew "curl"                     # [OPTIONAL]  QoL: Modern curl with HTTP/3 and OpenSSL
+brew "nmap"                     # [OPTIONAL]  Task-specific: Network diagnostics and port scanning
+
+# ==========================================
+# 7. Desktop Apps
+# ==========================================
+cask "maccy"                    # [OPTIONAL]  QoL: Lightweight clipboard history manager
+cask "rectangle"                # [OPTIONAL]  QoL: Window management with keyboard shortcuts
+cask "zed"                      # [OPTIONAL]  QoL: Native code editor
