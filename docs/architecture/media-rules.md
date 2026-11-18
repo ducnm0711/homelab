@@ -91,4 +91,4 @@ qBittorrent stores downloads on the same media pools.
 
 - [Media stack](media-stack.md)
 - [Storage pools](storage.md)
-- [TrueNAS deployment](../deployment/README.md)
+- [TrueNAS deployment](../../hosts/home-nas-server-01/stacks/README.md)

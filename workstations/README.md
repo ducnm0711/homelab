@@ -13,29 +13,29 @@ Run the commands from the repository root unless the text says otherwise.
 The bootstrap script installs the base packages and the Helm plugins.
 
 ```bash
-./workstation/bootstrap.sh
+./workstations/bootstrap.sh
 ```
 
-You can also run `./bootstrap.sh` from the `workstation/` directory.
+You can also run `./bootstrap.sh` from the `workstations/` directory.
 
 To also install AGE and SOPS for encrypted secrets, run this command:
 
 ```bash
-./workstation/bootstrap.sh --with-secrets
+./workstations/bootstrap.sh --with-secrets
 ```
 
 The script performs these steps:
 
-- It runs `brew bundle` with `workstation/Brewfile`.
-- It runs `brew bundle` with `workstation/Brewfile.secrets` when you pass `--with-secrets`.
+- It runs `brew bundle` with `workstations/Brewfile`.
+- It runs `brew bundle` with `workstations/Brewfile.secrets` when you pass `--with-secrets`.
 - It checks that Homebrew and Helm are available.
 - It installs the `helm-diff` and `helm-secrets` plugins when they are absent.
 
 For a manual install, run these commands:
 
 ```bash
-brew bundle --file=workstation/Brewfile
-brew bundle --file=workstation/Brewfile.secrets
+brew bundle --file=workstations/Brewfile
+brew bundle --file=workstations/Brewfile.secrets
 helm plugin install https://github.com/databus23/helm-diff --verify=false
 helm plugin install https://github.com/jkroepke/helm-secrets --verify=false
 helm plugin list
@@ -49,7 +49,7 @@ SOPS secrets use AGE.
 The `.sops.yaml` file at the repository root sets the public key.
 Complete these steps only when you work with encrypted files.
 
-- Install AGE and SOPS with `./workstation/bootstrap.sh --with-secrets`.
+- Install AGE and SOPS with `./workstations/bootstrap.sh --with-secrets`.
 - Create the key directory and generate the key pair:
 
   ```bash
@@ -60,7 +60,7 @@ Complete these steps only when you work with encrypted files.
 - Confirm that your `~/.zshrc` sets `SOPS_AGE_KEY_FILE`.
   The `zshrc.template` file already exports the key path.
 - Start the Kubernetes lab when you need it.
-  See [../k8s-lab/README.md](../k8s-lab/README.md).
+  See [../clusters/README.md](../clusters/README.md).
 
 ## Shell and terminal
 
@@ -123,11 +123,11 @@ Copy each repository template to its target file.
 | `zed-settings.json.template` | `~/.config/zed/settings.json` |
 
 ```bash
-cp workstation/zshrc.template "$HOME/.zshrc"
+cp workstations/zshrc.template "$HOME/.zshrc"
 mkdir -p "$HOME/.config"
-cp workstation/starship.toml.template "$HOME/.config/starship.toml"
+cp workstations/starship.toml.template "$HOME/.config/starship.toml"
 mkdir -p "$HOME/.config/zed"
-cp workstation/zed-settings.json.template "$HOME/.config/zed/settings.json"
+cp workstations/zed-settings.json.template "$HOME/.config/zed/settings.json"
 ```
 
 The Starship configuration uses the Catppuccin Mocha palette.

@@ -64,4 +64,4 @@ install_plugin diff https://github.com/databus23/helm-diff
 install_plugin secrets https://github.com/jkroepke/helm-secrets
 
 echo "Bootstrap complete."
-echo "See workstation/README.md for the shell and editor configuration."
+echo "See workstations/README.md for the shell and editor configuration."

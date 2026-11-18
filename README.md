@@ -1,32 +1,48 @@
 # Homelab
 
-This repository has three independent parts.
-Each part has its own lifecycle and tooling.
+This repository holds my homelab configuration.
+Each top-level folder is a first-class domain with its own lifecycle and tooling.
 
-| Domain | Purpose | Entry point |
+## Repository taxonomy
+
+| Folder | Purpose | Entry point |
 | :--- | :--- | :--- |
-| Workstation | Laptop setup, shell, and editor settings. | [workstation/](workstation/README.md) |
-| Kubernetes lab | On-demand local Kubernetes lab with k3d. | [k8s-lab/](k8s-lab/README.md) |
-| Homelab systems | TrueNAS server and Raspberry Pi server. | [homelab/](homelab/README.md) |
+| `hosts/` | Persistent bare-metal servers and NAS hosts. | [hosts/README.md](hosts/README.md) |
+| `clusters/` | On-demand Kubernetes labs and manifests. | [clusters/README.md](clusters/README.md) |
+| `workstations/` | macOS laptop provisioning and editor settings. | [workstations/README.md](workstations/README.md) |
+| `docs/` | Architecture notes and design proposals. | [docs/architecture/README.md](docs/architecture/README.md) |
+| `scripts/` | Shared host automation. | [scripts/renew-tailscale-cert.sh](scripts/renew-tailscale-cert.sh) |
 
-## Workstation
+## Active host inventory
 
-The `workstation/` directory holds the setup for my workstation.
-It includes shell configuration, bootstrap scripts, and editor settings.
+| Host | Role | Hardware | Platform | IP |
+| :--- | :--- | :--- | :--- | :--- |
+| `home-nas-server-01` | Primary NAS and container host. | Intel Core i3-9100F, 32 GB RAM, GTX 1060 6 GB. | TrueNAS SCALE. | `192.168.1.69` |
+| `home-dns-pi-01` | Network DNS and ad blocking. | Raspberry Pi 3 Model B, 32 GB high endurance SD. | Raspberry Pi OS Lite. | `192.168.1.11` |
 
-## Kubernetes lab
+## Service catalog
 
-The `k8s-lab/` directory holds the on-demand Kubernetes lab.
-It uses k3d, Helmfile, Helm charts, SOPS, and raw manifests.
+| Stack | Services | Storage tier |
+| :--- | :--- | :--- |
+| [00-vpn-stack](hosts/home-nas-server-01/stacks/00-vpn-stack/) | Traefik, Tailscale, and Homepage. | `/mnt/fast` |
+| [01-media-stack](hosts/home-nas-server-01/stacks/01-media-stack/) | Jellyfin, Radarr, Sonarr, Prowlarr, Bazarr, and qBittorrent. | `/mnt/fast` and `/mnt/media-*` |
 
-## Homelab systems
+Portainer manages both stacks on the TrueNAS host.
+The Compose files in this repository are source copies only.
+Do not edit a deployed stack from this repository.
 
-The `homelab/` directory holds the physical home systems.
-It includes the TrueNAS SCALE server and the Raspberry Pi server.
-The TrueNAS server runs Docker Compose stacks behind Traefik and Tailscale.
-The Raspberry Pi runs Pi-hole and DNSCrypt-proxy.
+## Planned hosts
+
+Two hosts are proposed but not deployed.
+See [lab-storage-mac-01](docs/proposals/lab-storage-mac-01.md) and [tl-sg105e-sw-01](docs/proposals/tl-sg105e-sw-01.md).
+
+## Quickstart
+
+- Set up the laptop with [workstations/README.md](workstations/README.md).
+- Start the Kubernetes lab with [clusters/README.md](clusters/README.md).
+- Deploy or recover the NAS stacks with [hosts/home-nas-server-01/stacks/README.md](hosts/home-nas-server-01/stacks/README.md).
 
 ## Rules
 
-All writing follows [99-rules/writing.md](99-rules/writing.md).
+All writing follows [rules/writing.md](rules/writing.md).
 Agents follow [AGENTS.md](AGENTS.md).

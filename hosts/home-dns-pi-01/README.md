@@ -32,7 +32,7 @@ Use the command-line interface (CLI) to configure the network. You can use a wir
 #### 3.1.1 Wired Connection
 ```bash
 # 1. Rename profile to "wired", assign static IP, set gateway/DNS, and disable DHCP
-nmcli connection modify "Wired connection 1" connection.id "wired" ipv4.addresses "192.168.1.111/24" ipv4.gateway "192.168.1.1" ipv4.dns "192.168.1.1" ipv4.method manual
+nmcli connection modify "Wired connection 1" connection.id "wired" ipv4.addresses "192.168.1.11/24" ipv4.gateway "192.168.1.1" ipv4.dns "192.168.1.1" ipv4.method manual
 # 2. Restart the network connection using the new profile name:
 nmcli connection up "wired"
 ```
@@ -42,8 +42,8 @@ nmcli connection up "wired"
 nmcli device wifi list
 # 2. Connect to a wireless network (WLAN).
 nmcli device wifi connect "YourSSID" password "YourPassword"
-# 3. Set a static IP address. Type this command (Change `YourSSID` and `192.168.1.111/24` to your network data):   
-nmcli connection modify "YourSSID" ipv4.addresses 192.168.1.111/24 ipv4.method manual
+# 3. Set a static IP address. Type this command (Change `YourSSID` and `192.168.1.11/24` to your network data):
+nmcli connection modify "YourSSID" ipv4.addresses 192.168.1.11/24 ipv4.method manual
 # 4. Set the gateway IP address. Type this command (Change `192.168.1.1` to your router IP address):
 nmcli connection modify "YourSSID" ipv4.gateway 192.168.1.1
 # 5. Set the DNS server. Type this command:

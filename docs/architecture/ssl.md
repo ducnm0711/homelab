@@ -5,7 +5,7 @@ The `renew-tailscale-cert.sh` script renews the certificate and binds it to the 
 
 ## Script
 
-The script is in [../deployment/scripts/renew-tailscale-cert.sh](../deployment/scripts/renew-tailscale-cert.sh).
+The script is in [../../scripts/renew-tailscale-cert.sh](../../scripts/renew-tailscale-cert.sh).
 
 ## Run
 
