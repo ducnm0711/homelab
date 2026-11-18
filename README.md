@@ -20,10 +20,6 @@ Each top-level folder is a first-class domain with its own lifecycle and tooling
 | `home-nas-server-01` | Primary NAS and container host. | Intel Core i3-9100F, 32 GB RAM, GTX 1060 6 GB. | TrueNAS SCALE. | `192.168.1.69` |
 | `home-dns-pi-01` | Network DNS and ad blocking. | Raspberry Pi 3 Model B, 32 GB high endurance SD. | Raspberry Pi OS Lite. | `192.168.1.11` |
 
-The DNS Pi README uses `192.168.1.111`.
-The inventory above uses the value from the architecture proposal.
-The IP needs reconciliation.
-
 ## Service catalog
 
 | Stack | Services | Storage tier |
@@ -48,5 +44,5 @@ See [lab-storage-mac-01](docs/proposals/lab-storage-mac-01.md) and [tl-sg105e-sw
 
 ## Rules
 
-All writing follows [99-rules/writing.md](99-rules/writing.md).
+All writing follows [rules/writing.md](rules/writing.md).
 Agents follow [AGENTS.md](AGENTS.md).
