@@ -20,7 +20,7 @@ Naming, cleanup, and subtitle rules are in [Media rules](media-rules.md).
 | **prowlarr** | Indexer manager | LAN `:9696` only |
 | **qbittorrent** | Download client | LAN `:8080` + torrent `:6881` |
 
-Traefik runs in the separate [`00-vpn-stack`](../deployment/00-vpn-stack); this stack joins its external `proxy` network.
+Traefik runs in the separate [`00-vpn-stack`](../../hosts/home-nas-server-01/stacks/00-vpn-stack); this stack joins its external `proxy` network.
 
 ---
 

@@ -6,7 +6,7 @@ A failure in one pool does not take the other pools with it.
 
 Remote access for applications sits on Tailscale.
 That layer is separate from pool design.
-See [00-vpn-stack](../deployment/00-vpn-stack) for the application Tailnet and Traefik.
+See [00-vpn-stack](../../hosts/home-nas-server-01/stacks/00-vpn-stack) for the application Tailnet and Traefik.
 
 ## Pools
 
@@ -36,4 +36,4 @@ Automation can download the missing media again.
 
 Compose maps `/mnt/media-01` to movies.
 Compose maps `/mnt/media-02` to series.
-See [01-media-stack](../deployment/01-media-stack).
+See [01-media-stack](../../hosts/home-nas-server-01/stacks/01-media-stack).

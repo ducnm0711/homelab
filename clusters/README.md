@@ -9,7 +9,7 @@ At the point this document was written, the Kubernetes lab is deployed as a mini
 Start the cluster only when you need it.
 
 The workstation setup installs k3d, Helm, and Helmfile.
-See [../workstation/README.md](../workstation/README.md).
+See [../workstations/README.md](../workstations/README.md).
 
 ## Profiles
 

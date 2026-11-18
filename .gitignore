@@ -2,3 +2,9 @@
 *.tgz
 .vscode
 .DS_Store
+.env
+*.age
+*.db
+*.sqlite
+*.sqlite3
+appdata/
