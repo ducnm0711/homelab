@@ -26,8 +26,9 @@ Each top-level folder is a first-class domain with its own lifecycle and tooling
 | :--- | :--- | :--- |
 | [00-vpn-stack](hosts/home-nas-server-01/stacks/00-vpn-stack/) | Traefik, Tailscale, and Homepage. | `/mnt/fast` |
 | [01-media-stack](hosts/home-nas-server-01/stacks/01-media-stack/) | Jellyfin, Radarr, Sonarr, Prowlarr, Bazarr, and qBittorrent. | `/mnt/fast` and `/mnt/media-*` |
+| [02-auth-stack](hosts/home-nas-server-01/stacks/02-auth-stack/) | Authelia. | `/mnt/fast` |
 
-Portainer manages both stacks on the TrueNAS host.
+Portainer manages all stacks on the TrueNAS host.
 The Compose files in this repository are source copies only.
 Do not edit a deployed stack from this repository.
 
@@ -46,3 +47,12 @@ See [lab-storage-mac-01](docs/proposals/lab-storage-mac-01.md) and [tl-sg105e-sw
 
 All writing follows [rules/writing.md](rules/writing.md).
 Agents follow [AGENTS.md](AGENTS.md).
+
+## Hooks
+
+Enable the repository hooks after each clone.
+The pre-push hook blocks branches that start with `local`.
+
+```bash
+git config core.hooksPath .githooks
+```

@@ -157,10 +157,15 @@ services:
     image: <image>:<tag>
     networks:
       - proxy
+    expose:
+      - "<port>"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.<name>.rule=Host(`homelab.com`) && PathPrefix(`/<path>`)"
       - "traefik.http.routers.<name>.entrypoints=websecure"
+      - "traefik.http.routers.<name>.tls=true"
+      - "traefik.http.routers.<name>.tls.certresolver=tailscale"
       - "traefik.http.middlewares.<name>-strip.stripprefix.prefixes=/<path>"
       - "traefik.http.routers.<name>.middlewares=<name>-strip"
       - "traefik.http.services.<name>.loadbalancer.server.port=<port>"
@@ -236,7 +241,8 @@ All configuration state details, runtime application data, and raw storage eleme
 
 To maintain a Zero-Trust profile, this architecture enforces the following security compliance rules:
 
-* **Zero-Port Bindings:** Do not use host port bindings (`ports: - "X:Y"`) inside any container compose files. Containers must communicate purely over private, virtual Docker networks (`homelab-private`).
+* **Zero-Port Bindings:** Do not use host port bindings (`ports: - "X:Y"`) for application web UIs. Containers must communicate over private Docker networks. Document each internal listener with `expose`.
+* **Approved Port Exceptions:** qBittorrent may publish `6881/tcp` and `6881/udp` for torrent peers. Portainer may use a temporary `9000:9000` mapping for break-glass access. Remove the Portainer mapping after the repair.
 * **Perimeter Lockdown:** Ports `80`, `443`, `3000`, `8080`, `9090`, and `9443` must remain closed on your home router. No port forwarding rules or DMZ configurations are permitted.
 * **Encapsulation Enforcement:** All ingress traffic must pass through the encrypted native or containerized Tailscale adapters. If a client disconnects from the Tailnet, access to both the management and application planes is blocked instantly.
 

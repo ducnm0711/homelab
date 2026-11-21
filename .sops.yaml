@@ -1,3 +1,3 @@
 creation_rules:
-  - path_regex: .*\.(yaml|json|env)$
+  - path_regex: .*\.(yaml|json)$
     age: "age150ragpc4lx6lnerxmk8azclsc5jwwz984ewfgdlxtm9k6z0a7smqgwx66l"

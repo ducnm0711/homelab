@@ -1,0 +1,14 @@
+#!/bin/sh
+
+while read local_ref local_sha remote_ref remote_sha
+do
+  branch_name=${local_ref#refs/heads/}
+  case "$branch_name" in
+    local*)
+      echo "Error: Pushing branch '$branch_name' is blocked because it starts with 'local'."
+      exit 1
+      ;;
+  esac
+done
+
+exit 0
