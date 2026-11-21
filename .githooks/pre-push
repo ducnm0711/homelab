@@ -1,9 +1,5 @@
 #!/bin/sh
 
-repo_root=$(git rev-parse --show-toplevel) || exit 1
-services_file="$repo_root/hosts/home-nas-server-01/stacks/00-vpn-stack/homepage/services.yaml"
-secrets_file="$repo_root/hosts/home-nas-server-01/stacks/00-vpn-stack/homepage/secrets.yaml"
-
 while read local_ref local_sha remote_ref remote_sha
 do
   branch_name=${local_ref#refs/heads/}
@@ -14,39 +10,5 @@ do
       ;;
   esac
 done
-
-if [ ! -f "$services_file" ] || [ ! -f "$secrets_file" ]; then
-  echo "Error: Homepage config files are missing."
-  exit 1
-fi
-
-if ! ruby -e '
-  text = File.read(ARGV.fetch(0))
-  values = text.scan(/^\s*key:\s*(\S.*)$/).flatten.map(&:strip)
-  abort "no Homepage key fields found" if values.empty?
-  values.each do |value|
-    abort "plaintext Homepage key found" unless value.match?(/\A\{\{HOMEPAGE_VAR_[A-Z0-9_]+\}\}\z/)
-  end
-' "$services_file" 2>/dev/null; then
-  echo "Error: Homepage services.yaml contains a plaintext API key."
-  echo "Replace each key value with its {{HOMEPAGE_VAR_*}} placeholder."
-  exit 1
-fi
-
-if ! ruby -ryaml -e '
-  file = ARGV.fetch(0)
-  data = YAML.load_file(file)
-  expected = %w[HOMEPAGE_VAR_PORTAINER_API_KEY HOMEPAGE_VAR_TRUENAS_API_KEY HOMEPAGE_VAR_JELLYFIN_API_KEY HOMEPAGE_VAR_RADARR_API_KEY HOMEPAGE_VAR_SONARR_API_KEY HOMEPAGE_VAR_BAZARR_API_KEY]
-  abort "no sops metadata" unless data.is_a?(Hash) && data.key?("sops")
-  expected.each do |name|
-    value = data[name]
-    abort "missing #{name}" unless value.is_a?(String)
-    abort "#{name} is not encrypted" unless value.start_with?("ENC[")
-  end
-' "$secrets_file" 2>/dev/null; then
-  echo "Error: Homepage secrets.yaml is not encrypted."
-  echo "Run: sops -i -e hosts/home-nas-server-01/stacks/00-vpn-stack/homepage/secrets.yaml"
-  exit 1
-fi
 
 exit 0

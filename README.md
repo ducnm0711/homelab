@@ -51,6 +51,7 @@ Agents follow [AGENTS.md](AGENTS.md).
 ## Hooks
 
 Enable the repository hooks after each clone.
+The pre-push hook blocks branches that start with `local`.
 
 ```bash
 git config core.hooksPath .githooks

@@ -34,29 +34,21 @@ tailscale cert home-nas-server-01.akita-beaufort.ts.net
 
 ### Set the Homepage API keys
 
-The Homepage widget keys are in an encrypted companion file.
-Render the file to the env file that Compose loads.
-Run this command from the repository root:
+Create `/mnt/fast/app/homepage/.env` on the NAS host.
+Add one line for each Homepage widget key:
 
-```bash
-set -o pipefail
-sops -d hosts/home-nas-server-01/stacks/00-vpn-stack/homepage/secrets.yaml |
-ruby -ryaml -e '
-  quote = 39.chr
-  slash = 92.chr
-  secrets = YAML.safe_load(STDIN.read)
-  lines = secrets.map do |name, value|
-    escaped = value.to_s.gsub(quote) { quote + slash + quote + quote }
-    "#{name}=#{quote}#{escaped}#{quote}"
-  end
-  path = ARGV.fetch(0)
-  File.write(path, lines.join("\n") + "\n")
-  File.chmod(0600, path)
-' /mnt/fast/app/homepage/secrets.env
+```dotenv
+HOMEPAGE_VAR_PORTAINER_API_KEY=your-key
+HOMEPAGE_VAR_TRUENAS_API_KEY=your-key
+HOMEPAGE_VAR_JELLYFIN_API_KEY=your-key
+HOMEPAGE_VAR_RADARR_API_KEY=your-key
+HOMEPAGE_VAR_SONARR_API_KEY=your-key
+HOMEPAGE_VAR_BAZARR_API_KEY=your-key
 ```
 
-Restart Homepage after you change the env file.
-Do not commit the decrypted values.
+Compose loads this file when Homepage starts.
+Restart Homepage after you change the file.
+Do not commit the file.
 
 ### Add temporary setup basic auth
 
