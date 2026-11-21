@@ -32,6 +32,26 @@ Generate the certificate for the management UI:
 tailscale cert home-nas-server-01.akita-beaufort.ts.net
 ```
 
+### Set the Homepage API keys
+
+The Homepage widget keys are in an encrypted companion file.
+Run this command from the repository root:
+
+```bash
+sops -d hosts/home-nas-server-01/stacks/00-vpn-stack/homepage/secrets.yaml
+```
+
+Export these variables before you deploy the VPN stack:
+
+- `PORTAINER_API_KEY`
+- `TRUENAS_API_KEY`
+- `JELLYFIN_API_KEY`
+- `RADARR_API_KEY`
+- `SONARR_API_KEY`
+- `BAZARR_API_KEY`
+
+Do not commit the decrypted values.
+
 ### Add temporary setup basic auth
 
 Use basic auth during setup.
