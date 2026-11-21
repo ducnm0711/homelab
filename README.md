@@ -26,6 +26,7 @@ Each top-level folder is a first-class domain with its own lifecycle and tooling
 | :--- | :--- | :--- |
 | [00-vpn-stack](hosts/home-nas-server-01/stacks/00-vpn-stack/) | Traefik, Tailscale, and Homepage. | `/mnt/fast` |
 | [01-media-stack](hosts/home-nas-server-01/stacks/01-media-stack/) | Jellyfin, Radarr, Sonarr, Prowlarr, Bazarr, and qBittorrent. | `/mnt/fast` and `/mnt/media-*` |
+| [02-auth-stack](hosts/home-nas-server-01/stacks/02-auth-stack/) | Authelia. | `/mnt/fast` |
 
 Portainer manages both stacks on the TrueNAS host.
 The Compose files in this repository are source copies only.
