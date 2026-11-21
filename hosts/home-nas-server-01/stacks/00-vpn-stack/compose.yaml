@@ -70,7 +70,7 @@ services:
         aliases:
           - homepage
     env_file:
-      - /mnt/fast/app/homepage/.env
+      - stack.env
     environment:
       HOMEPAGE_ALLOWED_HOSTS: home-media.akita-beaufort.ts.net
       PUID: 568
