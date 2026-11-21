@@ -62,6 +62,14 @@ services:
     image: ghcr.io/gethomepage/homepage:v2.6.0
     container_name: 02-homepage
     restart: unless-stopped
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -a
+        [ -f /app/config/.env ] && . /app/config/.env
+        set +a
+        exec docker-entrypoint.sh node server.js
     depends_on:
       00-traefik:
         condition: service_started
@@ -69,15 +77,13 @@ services:
       proxy:
         aliases:
           - homepage
-    env_file:
-      - stack.env
     environment:
       HOMEPAGE_ALLOWED_HOSTS: home-media.akita-beaufort.ts.net
       PUID: 568
       PGID: 568
     volumes:
       - /mnt/fast/app/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     expose:
       - "3000"
     labels:

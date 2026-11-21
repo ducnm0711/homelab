@@ -34,7 +34,8 @@ tailscale cert home-nas-server-01.akita-beaufort.ts.net
 
 ### Set the Homepage API keys
 
-Add these variables in the Portainer stack environment variables section:
+Create `/mnt/fast/app/homepage/.env` on the NAS host before deployment.
+Add one line for each Homepage widget key:
 
 ```dotenv
 HOMEPAGE_VAR_PORTAINER_API_KEY=your-key
@@ -45,9 +46,9 @@ HOMEPAGE_VAR_SONARR_API_KEY=your-key
 HOMEPAGE_VAR_BAZARR_API_KEY=your-key
 ```
 
-Portainer writes these values to `stack.env` in the stack directory.
-Compose loads `stack.env` into the Homepage container.
-You can also use `Load variables from .env file` with the same lines.
+The Homepage bind mount exposes this file at `/app/config/.env`.
+The container entrypoint loads the file before Homepage starts.
+Do not add these values to the Portainer stack environment variables section.
 Do not commit the values.
 
 ### Add temporary setup basic auth
