@@ -69,16 +69,12 @@ services:
       proxy:
         aliases:
           - homepage
+    env_file:
+      - /mnt/fast/app/homepage/secrets.env
     environment:
       HOMEPAGE_ALLOWED_HOSTS: home-media.akita-beaufort.ts.net
       PUID: 568
       PGID: 568
-      PORTAINER_API_KEY: ${PORTAINER_API_KEY}
-      TRUENAS_API_KEY: ${TRUENAS_API_KEY}
-      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
-      RADARR_API_KEY: ${RADARR_API_KEY}
-      SONARR_API_KEY: ${SONARR_API_KEY}
-      BAZARR_API_KEY: ${BAZARR_API_KEY}
     volumes:
       - /mnt/fast/app/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro 

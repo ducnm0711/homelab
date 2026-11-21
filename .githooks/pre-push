@@ -20,33 +20,23 @@ if [ ! -f "$services_file" ] || [ ! -f "$secrets_file" ]; then
   exit 1
 fi
 
-if ! ruby -ryaml -e '
-  file = ARGV.fetch(0)
-  data = YAML.load_file(file)
-  values = []
-  walk = lambda do |node|
-    case node
-    when Hash
-      node.each { |key, value| key.to_s == "key" ? values << value : walk.call(value) }
-    when Array
-      node.each { |value| walk.call(value) }
-    end
-  end
-  walk.call(data)
+if ! ruby -e '
+  text = File.read(ARGV.fetch(0))
+  values = text.scan(/^\s*key:\s*(\S.*)$/).flatten.map(&:strip)
   abort "no Homepage key fields found" if values.empty?
   values.each do |value|
-    abort "plaintext Homepage key found" unless value.is_a?(String) && value.match?(/\A\$\{[A-Z0-9_]+\}\z/)
+    abort "plaintext Homepage key found" unless value.match?(/\A\{\{HOMEPAGE_VAR_[A-Z0-9_]+\}\}\z/)
   end
 ' "$services_file" 2>/dev/null; then
   echo "Error: Homepage services.yaml contains a plaintext API key."
-  echo "Replace each key value with its \${ENV_VAR} placeholder."
+  echo "Replace each key value with its {{HOMEPAGE_VAR_*}} placeholder."
   exit 1
 fi
 
 if ! ruby -ryaml -e '
   file = ARGV.fetch(0)
   data = YAML.load_file(file)
-  expected = %w[PORTAINER_API_KEY TRUENAS_API_KEY JELLYFIN_API_KEY RADARR_API_KEY SONARR_API_KEY BAZARR_API_KEY]
+  expected = %w[HOMEPAGE_VAR_PORTAINER_API_KEY HOMEPAGE_VAR_TRUENAS_API_KEY HOMEPAGE_VAR_JELLYFIN_API_KEY HOMEPAGE_VAR_RADARR_API_KEY HOMEPAGE_VAR_SONARR_API_KEY HOMEPAGE_VAR_BAZARR_API_KEY]
   abort "no sops metadata" unless data.is_a?(Hash) && data.key?("sops")
   expected.each do |name|
     value = data[name]
